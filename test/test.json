@@ -1,0 +1,13 @@
+{
+   "object": {
+     "name": "ywl",
+     "age": 22
+   },
+   "int": 123,
+   "bool": true,
+   "string": "centos",
+   "double": 123.999,
+   "array": [
+     1995
+   ]
+ }
