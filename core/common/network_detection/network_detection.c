@@ -27,11 +27,6 @@ static int s_socket = -1;
 
 static char udp_buf[NET_DATA_LEN_MAX];
 
-struct class_poll{
-    char *data;
-    unsigned int len;
-};
-
 struct class_normal_daemon{
     unsigned int length;
     unsigned char cmd;
@@ -39,16 +34,6 @@ struct class_normal_daemon{
     unsigned char ip[4];
     char time[0];
 }PACKED;
-
-static struct class_poll test_send = {
-    "daemon heart",
-    12
-};
-
-void send_udp_data(char *data, unsigned int len)
-{
-    m_udpsock_send(s_socket, NULL, VER_CENTER_PORT, data, len);
-}
 
 int recv_udp_data(struct sockaddr_in *sin)
 {
@@ -64,6 +49,7 @@ static void send_normal_packet(void)
     send = (struct class_normal_daemon *)m_memory_alloc(1024);
     free(send);
 
+    char ip[] = {192,168,245,128};
     size_t len = 0;
     struct json_object *obj_send = json_object_new_object();
     json_object_object_add(obj_send, "pro-name", json_object_new_string("daemon"));
@@ -71,7 +57,9 @@ static void send_normal_packet(void)
 
     char *send_js_str = (char *)json_object_to_json_string_length(obj_send, JSON_C_TO_STRING_NOSLASHESCAPE, &len);
 
-    m_udpsock_send(s_socket, NULL, 9567, send_js_str, len);
+    dbg_print("%s  | str_len = %d, real_len = %d", send_js_str, len, strlen(send_js_str));
+
+    printf("%d\n", m_udpsock_send(s_socket, ip, APPLICATION_PORT, send_js_str, len));
     json_object_put(obj_send);
 
     return;
@@ -79,7 +67,8 @@ static void send_normal_packet(void)
 
 static int create_udp_simple(void)
 {
-    return m_udpsock_create(NULL, NULL, DAEMON_SERVER_PORT, 2, 5);
+    char ip[] = {192,168,245,128};
+    return m_udpsock_create(NULL, ip, DAEMON_SERVER_PORT, 2, 5);
 }
 
 static bool check_recv_udp_data(int len)
@@ -165,7 +154,6 @@ static void network_task(void)
             }
         }
         send_normal_packet();
-        send_udp_data(test_send.data, test_send.len);
         len = recv_udp_data(&sin);
         if(check_recv_udp_data(len))
         {
