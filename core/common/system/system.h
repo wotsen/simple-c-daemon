@@ -15,6 +15,12 @@
 #ifndef _SYSTEM_H
 #define _SYSTEM_H
 
+char *os_type(void);
+char *hostname(void);
+char *os_release(void);
+char *os_version(void);
+char *os_machine(void);
+
 void system_start(void);
 
 #endif

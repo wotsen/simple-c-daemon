@@ -3,7 +3,7 @@ from socket import *
 import json
 import time
 
-HOST = '192.168.245.128'
+HOST = '0.0.0.0'
 PORT = 6002
 s = socket(AF_INET,SOCK_DGRAM)
 s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)

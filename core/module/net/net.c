@@ -30,7 +30,7 @@ int m_udpsock_create(char *eth, char *ip, unsigned short port, unsigned int send
 
 	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
 	{
-		system_log(LV_ERROR, "[UDP]socket:%s\r\n", strerror(errno));
+		system_log(LV_ERROR, "[UDP]socket:%s", strerror(errno));
 		return false;
 	}
 	if(eth)		//socket绑定网卡
@@ -39,7 +39,7 @@ int m_udpsock_create(char *eth, char *ip, unsigned short port, unsigned int send
 		strcpy(ifr.ifr_name, (char *)eth);
 		if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, (char *)&ifr, sizeof(struct ifreq)) == -1)
 		{
-			system_log(LV_ERROR, "[UDP]setsockopt:%s\r\n", strerror(errno));
+			system_log(LV_ERROR, "[UDP]setsockopt:%s", strerror(errno));
 			close(sock);
 			return false;
 		}
@@ -47,7 +47,7 @@ int m_udpsock_create(char *eth, char *ip, unsigned short port, unsigned int send
 	tmps = 1;		// 允许发送广播数据
 	if(setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &tmps, sizeof(tmps)) == -1)
 	{
-		system_log(LV_ERROR, "[UDP广播]:setsockopt:%s\r\n", strerror(errno));
+		system_log(LV_ERROR, "[UDP广播]:setsockopt:%s", strerror(errno));
 		close(sock);
 		return false;
 	}
@@ -66,7 +66,7 @@ int m_udpsock_create(char *eth, char *ip, unsigned short port, unsigned int send
 	memset(&sin.sin_zero, 0, 8);
 	if(bind(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)		//绑定socket
 	{
-		system_log(LV_ERROR, "[UDP]bind:%s\r\n", strerror(errno));
+		system_log(LV_ERROR, "[UDP]bind:%s", strerror(errno));
 		close(sock);
 		return false;
 	}
@@ -76,7 +76,7 @@ int m_udpsock_create(char *eth, char *ip, unsigned short port, unsigned int send
 	tv_out.tv_sec = recvtime;			//超时秒数
 	tv_out.tv_usec = 0;
 	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv_out, sizeof(tv_out));		// 设置接收超时
-	system_info("[UDP]服务器建立成功%u.%u.%u.%u:%d\r\n", INET_NTOA(sin.sin_addr.s_addr), ntohs(sin.sin_port));
+	system_info("[UDP]服务器建立成功%u.%u.%u.%u:%d", INET_NTOA(sin.sin_addr.s_addr), ntohs(sin.sin_port));
 	return sock;
 }
 /* UDP发送 */

@@ -43,23 +43,78 @@ int recv_udp_data(struct sockaddr_in *sin)
     return len;
 }
 
+const char *module_name[] = {
+    "module-name",
+    "module-id",
+    "msg-ack",
+    "msg-cmd"
+};
+
+struct msg_module_info {
+    const char *key;
+    char content[20];
+};
+
+static struct msg_module_info heart_module[] = {
+    {"module-name", "heart beat"},
+    {"module-id", "0x1"},
+    {"msg-ack", "none"},
+    {"msg-cmd", "none"},
+    {NULL, {0}}
+};
+
+
+struct os_base_info {
+    const char *key;
+    char *(*get)();
+};
+
+static const struct os_base_info system_uname[] = {
+    {"os-type", os_type},
+    {"hostnme", hostname},
+    {"os-release", os_release},
+    {"os-version", os_version},
+    {"os-machine", os_machine},
+    {NULL, NULL}
+};
+
+
+static struct json_object *pack_json_head(struct msg_module_info *module)
+{
+    int i = 0;
+    char time[256];
+    struct json_object *obj = json_object_new_object();
+    struct json_object *hobj = json_object_new_object();
+
+    memset(time, 0, sizeof(time));
+    m_getostimestr(time);
+
+    for(i = 0; NULL != system_uname[i].key; i++)
+    {
+        json_object_object_add(hobj, system_uname[i].key, json_object_new_string(system_uname[i].get()));
+    }
+    json_object_object_add(hobj, "cur-time", json_object_new_string(time));
+
+    json_object_object_add(obj, "head", hobj);
+    for(i = 0; NULL != module[i].key; i++)
+    {
+        json_object_object_add(obj, module[i].key, json_object_new_string(module[i].content));
+    }
+
+    return obj;
+}
+
 static void send_normal_packet(void)
 {
-    struct class_normal_daemon *send;
-    send = (struct class_normal_daemon *)m_memory_alloc(1024);
-    free(send);
-
-    char ip[] = {192,168,245,128};
     size_t len = 0;
-    struct json_object *obj_send = json_object_new_object();
-    json_object_object_add(obj_send, "pro-name", json_object_new_string("daemon"));
-    json_object_object_add(obj_send, "content", json_object_new_string("sync pack"));
+    struct json_object *obj_send = pack_json_head(heart_module);
 
     char *send_js_str = (char *)json_object_to_json_string_length(obj_send, JSON_C_TO_STRING_NOSLASHESCAPE, &len);
 
+    //dbg_print("heart-beat : %s", json_object_to_json_string_ext(obj_send, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
     dbg_print("%s  | str_len = %d, real_len = %d", send_js_str, len, strlen(send_js_str));
 
-    printf("%d\n", m_udpsock_send(s_socket, ip, APPLICATION_PORT, send_js_str, len));
+    m_udpsock_send(s_socket, NULL, APPLICATION_PORT, send_js_str, len);
     json_object_put(obj_send);
 
     return;
@@ -67,8 +122,7 @@ static void send_normal_packet(void)
 
 static int create_udp_simple(void)
 {
-    char ip[] = {192,168,245,128};
-    return m_udpsock_create(NULL, ip, DAEMON_SERVER_PORT, 2, 5);
+    return m_udpsock_create(NULL, NULL, DAEMON_SERVER_PORT, 2, 5);
 }
 
 static bool check_recv_udp_data(int len)

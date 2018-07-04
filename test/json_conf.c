@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include <json-c/json.h>
+#include <json-c/json_object_private.h>
 
 
 int main()
@@ -26,6 +27,8 @@ int main()
     struct json_object *object = json_object_new_object();
     struct json_object *object1 = json_object_new_object();
     struct json_object *array = json_object_new_array();
+
+    printf("%ld\n", object->_ref_count);
 
     json_object_object_add(object1, "name", json_object_new_string("ywl"));
     json_object_object_add(object1, "age", json_object_new_int(22));
@@ -49,8 +52,13 @@ int main()
     printf("json-string : \n %s\n", json_object_to_json_string_ext(object, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
 #endif
 
+    printf("%ld\n", object1->_ref_count);
+    json_object_put(object);
+    json_object_object_add(object1, "age1", json_object_new_int(98));
+    json_object_object_add(object1, "age2", json_object_new_int(1024));
+    printf("json-string2 : \n %s\n", json_object_to_json_string_ext(object1, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
     json_object_put(object1);
     json_object_put(array);
-    json_object_put(object);
+    //json_object_put(object);
     return 0;
 }
