@@ -4,6 +4,11 @@
 
 #ifndef DAEMON_NETWORK_PROTOCOL_H
 #define DAEMON_NETWORK_PROTOCOL_H
+#include "../../module/tools/tools.h"
+
+#define DAEMON_SERVER_PORT      6000
+#define VER_CENTER_PORT         6001
+#define APPLICATION_PORT        6002
 
 #define NET_DATA_LEN_MAX        1024
 
@@ -18,7 +23,7 @@
 #define CMD_SET                 0x1
 
 typedef struct{
-#define PACK_HEAD_LEN   17
+#define PACK_HEAD_LEN           17
     int src;
     int dest;
     int len;
@@ -28,7 +33,7 @@ typedef struct{
 }PACKED class_pack_head;
 
 typedef struct {
-#define SYNC_HEART_ID      0x01
+#define SYNC_HEART_ID           0x01
     short id;
     char cmd;
     char position[20];

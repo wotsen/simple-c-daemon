@@ -25,10 +25,6 @@
 #define LV_ERROR    ZLOG_LEVEL_ERROR
 #define LV_FATAL    ZLOG_LEVEL_FATAL
 
-#define SYSTEM_LOG_CONF     "./system/etc/system_conf/system_log.conf"
-#define PROGRAM_DBG         "program"
-#define USER_LOG            "user"
-#define SYSTEM_LOG          "system"
 
 void s_system_log(char lv, const char *format, ...);
 void s_user_log(char lv, const char *format, ...);

@@ -43,13 +43,6 @@ int recv_udp_data(struct sockaddr_in *sin)
     return len;
 }
 
-const char *module_name[] = {
-    "module-name",
-    "module-id",
-    "msg-ack",
-    "msg-cmd"
-};
-
 struct msg_module_info {
     const char *key;
     char content[20];

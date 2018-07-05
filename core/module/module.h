@@ -20,7 +20,6 @@
 #include "tools/tools.h"
 #include "net/net.h"
 #include "timer/timer.h"
-#include "zlog_service/zlog_service.h"
 #include "encryption/encryption.h"
 #include "iniparser/iniparser.h"
 

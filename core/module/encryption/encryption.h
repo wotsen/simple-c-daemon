@@ -29,12 +29,13 @@ enum{
 
 #define OWNER_DES_KEY		"yuyuan34"
 
-unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest_str, unsigned char *md);
+unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest_str, 
+                        unsigned char *key, unsigned char *md);
 
-#define md5(str, md)	openssl_lib(MD5_TYPE, str, md)
-#define sha256(str, md)	openssl_lib(SHA256_TYPE, str, md)
-#define des_en(str, md)	openssl_lib(DES_EN_TYPE, str, md)
-#define des_de(str, md)	openssl_lib(DES_DE_TYPE, str, md)
+#define md5(str, key, md)	openssl_lib(MD5_TYPE, str, key, md)
+#define sha256(str, key, md)	openssl_lib(SHA256_TYPE, str, key, md)
+#define des_en(str, key, md)	openssl_lib(DES_EN_TYPE, str, key, md)
+#define des_de(str, key, md)	openssl_lib(DES_DE_TYPE, str, key, md)
 
 #ifdef __cplusplus
 }

@@ -15,8 +15,11 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "../bool.h"
+#include "../../module/bool.h"
+#include "zlog_config.h"
 #include "zlog_service.h"
+
+extern char zlog_config_path[60];
 
 static pthread_mutex_t zlog_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -71,7 +74,7 @@ void s_system_log(char lv, const char *format, ...)
 	va_list args;
 
 	va_start(args, format);
-    dzlog_out_stream(SYSTEM_LOG_CONF, SYSTEM_LOG, lv, format, args);
+    dzlog_out_stream((const char *)zlog_config_path, SYSTEM_LOG, lv, format, args);
 	va_end(args);
 }
 void s_user_log(char lv, const char *format, ...)
@@ -79,7 +82,7 @@ void s_user_log(char lv, const char *format, ...)
 	va_list args;
 
 	va_start(args, format);
-    dzlog_out_stream(SYSTEM_LOG_CONF, USER_LOG, lv, format, args);
+    dzlog_out_stream((const char *)zlog_config_path, USER_LOG, lv, format, args);
 	va_end(args);
 }
 void s_dbg_log(char lv, const char *format, ...)
@@ -87,7 +90,7 @@ void s_dbg_log(char lv, const char *format, ...)
 	va_list args;
 
 	va_start(args, format);
-    dzlog_out_stream(SYSTEM_LOG_CONF, PROGRAM_DBG, lv, format, args);
+    dzlog_out_stream((const char *)zlog_config_path, PROGRAM_DBG, lv, format, args);
 	va_end(args);
 }
 /*

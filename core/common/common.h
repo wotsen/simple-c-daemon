@@ -15,8 +15,10 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#include "zlog_service/zlog_service.h"
 #include "network_detection/network_detection.h"
 #include "system/system.h"
 #include "login/user_pass.h"
+#include "file_ops/file_ops.h"
 
 #endif

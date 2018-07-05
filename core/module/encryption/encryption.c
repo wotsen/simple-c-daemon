@@ -22,7 +22,7 @@
 #include "encryption.h"
 
 typedef unsigned char *(*encrypt_fun)(const unsigned char *, size_t len, unsigned char *);
-typedef unsigned char *(*abstract_fun)(unsigned char, const unsigned char *, unsigned char *);
+typedef unsigned char *(*abstract_fun)(unsigned char, const unsigned char *, unsigned char *, unsigned char *);
 
 static unsigned char *md5_sha256_abstract(unsigned char encrypt_type, const unsigned char *dest_str, 
                                         unsigned char *md)
@@ -62,13 +62,13 @@ static unsigned char *md5_sha256_abstract(unsigned char encrypt_type, const unsi
 
 
 static unsigned char *md5_abstract(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *md5)
+                                    unsigned char *key, unsigned char *md5)
 {
 	return md5_sha256_abstract(encrypt_type, dest_str, md5);
 }
 
 static unsigned char *sha256_abstract(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *sha256)
+                                    unsigned char *key, unsigned char *sha256)
 {
 	return md5_sha256_abstract(encrypt_type, dest_str, sha256);
 }
@@ -143,18 +143,18 @@ static unsigned char *__des_decrypt(const unsigned char *dest_str,
 }
 
 static unsigned char *des_encrypt(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *md)
+                                    unsigned char *key, unsigned char *md)
 {
-	return __des_encrypt(dest_str, (unsigned char *)OWNER_DES_KEY, md);
+	return __des_encrypt(dest_str, key, md);
 }
 static unsigned char *des_decrypt(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *md)
+                                    unsigned char *key,unsigned char *md)
 {
-	return __des_decrypt(dest_str, (unsigned char *)OWNER_DES_KEY, md);
+	return __des_decrypt(dest_str, key, md);
 }
 
 unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *md)
+                                    unsigned char *key, unsigned char *md)
 {
 	abstract_fun abstract;
 
@@ -176,7 +176,7 @@ unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest
 			return NULL;
 	}
 
-	return abstract(encrypt_type, dest_str, md);
+	return abstract(encrypt_type, dest_str, key, md);
 }
 
 

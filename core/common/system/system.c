@@ -17,40 +17,12 @@
 #include "../../module/module.h"
 #include "../common.h"
 
-static struct utsname os_info;
-
-static struct utsname __uname(void)
-{
-    memset(&os_info, 0, sizeof(struct utsname));
-    uname(&os_info);
-    return os_info;
-}
-
-char *os_type(void)
-{
-    return os_info.sysname;
-}
-
-char *hostname(void)
-{
-    return os_info.nodename;
-}
-char *os_release(void)
-{
-    return os_info.release;
-}
-char *os_version(void)
-{
-    return os_info.version;
-}
-char *os_machine(void)
-{
-    return os_info.machine;
-}
+extern void system_initial(void);
 
 void system_start(void)
 {
-    __uname();
+    system_initial();
+    system_info("..........................system start..................................");
     network_start();
     while(1)
     {

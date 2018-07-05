@@ -49,5 +49,20 @@
 #define min_t(type, a, b) min(((type) a), ((type) b))
 #define max_t(type, a, b) max(((type) a), ((type) b))
 
+/* data-type */
+#define __bool                          1
+#define __char                          2
+#define __uchar                         3
+#define __short                         4
+#define __ushort                        5
+#define __int                           6
+#define __uint                          7
+#define __ulong                         8
+#define __long                          9
+#define __ullong                        10
+#define __llong                         11
+#define __double                        12
+#define __str                           13
+#define __void                          14
 
 #endif

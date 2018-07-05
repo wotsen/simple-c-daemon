@@ -44,7 +44,7 @@ void create_daemon(void)
 int main(int args, char **argv)
 {
     //create_daemon();
-    system_info("..........................system start..................................");
+    printf("%d %s\n", args, argv[0]);
     system_start();
     return 0;
 }

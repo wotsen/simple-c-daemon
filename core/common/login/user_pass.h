@@ -15,7 +15,9 @@
 #ifndef _USER_PASS_H
 #define _USER_PASS_H
 
-#define USER_PASSWOR_DB_PATH    "./system/etc/user_password.db"
+#include "../file_ops/def_files.h"
+
+#define USER_PASSWOR_DB_PATH    DATABASE_PATH"user_password.db"
 #define CORE_USER_VERI_DB_NAME          "coreuser"
 
 #define DATABASE_LOW        0
