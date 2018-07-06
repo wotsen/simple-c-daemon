@@ -20,9 +20,9 @@
 
 
 /* permission */
-#define R_                              1
+#define r_                              1
 #define w_                              2
-#define RW                              3
+#define rw                              3
 
 /* section */
 #define SEC_SYSTEM_BASE                 "system_base"
@@ -48,5 +48,9 @@
 
 /* para.ini */
 #define KEY_PARA_INI_FILE               {"paratable-ini-file", 0x0009}
+
+
+/* modules id */
+#define ID_SYSTEM_BASE                  0x1
 
 #endif

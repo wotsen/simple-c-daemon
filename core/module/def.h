@@ -57,10 +57,10 @@
 #define __ushort                        5
 #define __int                           6
 #define __uint                          7
-#define __ulong                         8
-#define __long                          9
-#define __ullong                        10
-#define __llong                         11
+#define __long                          8
+#define __ulong                         9
+#define __llong                         10
+#define __ullong                        11
 #define __double                        12
 #define __str                           13
 #define __void                          14

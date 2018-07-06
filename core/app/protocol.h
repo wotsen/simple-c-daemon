@@ -26,10 +26,10 @@ typedef struct {
 }PACKED class_para_head;
 
 typedef struct {
-#define PARA_END    {{NULL, 0xFFFF}, 0, 0xFF, 0xFF, NULL, NULL, NULL, NULL, NULL, 0xFFFF, 0, 0, 0}
+#define PARA_END    {{NULL, 0xFFFF}, 0, 0xf, 0xFF, NULL, NULL, NULL, NULL, NULL, 0xFFFF, 0, 0, 0}
    class_para_head id; 
    const unsigned char len;
-   const unsigned char type;
+   const char type;
    const unsigned char permission;
    const char *init_val;
    void *address;
@@ -44,9 +44,10 @@ typedef struct {
 
 
 typedef struct {
+#define MODULE_END  {NULL, 0xFF, NULL, NULL, NULL}
     const char *section;
     const unsigned char id;
-    class_para *para_table;
+        class_para *para_table;
     char *(*exec)(void);
     void (*def_function)(void);
 }PACKED class_module;

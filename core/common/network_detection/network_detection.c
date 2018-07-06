@@ -105,7 +105,7 @@ static void send_normal_packet(void)
     char *send_js_str = (char *)json_object_to_json_string_length(obj_send, JSON_C_TO_STRING_NOSLASHESCAPE, &len);
 
     //dbg_print("heart-beat : %s", json_object_to_json_string_ext(obj_send, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
-    dbg_print("%s  | str_len = %d, real_len = %d", send_js_str, len, strlen(send_js_str));
+    //dbg_print("%s  | str_len = %d, real_len = %d", send_js_str, len, strlen(send_js_str));
 
     m_udpsock_send(s_socket, NULL, APPLICATION_PORT, send_js_str, len);
     json_object_put(obj_send);

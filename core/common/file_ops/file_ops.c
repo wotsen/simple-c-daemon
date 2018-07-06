@@ -16,6 +16,10 @@
  * =====================================================================================
  */
 #include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+#include <errno.h>
+#include <math.h>
 
 #include "../../module/def.h"
 #include "file_ops.h"
@@ -47,20 +51,14 @@ bool create_section(dictionary *dict, const char *section)
     return true;
 }
 
-bool set_key_value(dictionary *dict, const char *section, const char *key,  const char type, char *val)
+bool check_section(dictionary *dict, const char *section)
+{
+    return iniparser_find_entry(dict, section) ? true : false;
+}
+
+bool initial_key_value(dictionary *dict, const char *section, const char *key, char *val)
 {
     char section_key[256];
-    char s_val[256];
-
-    switch(type)
-    {
-        case __bool:
-            sprintf(s_val, "%s", (*val ? "true" : "false"));
-        case __str:
-            sprintf(s_val, "%s", val);
-        default:
-            return false;
-    }
     sprintf(section_key, "%s:%s", section, key);
 
     if(iniparser_set(dict, section_key, (char *)val) < 0)
@@ -70,6 +68,228 @@ bool set_key_value(dictionary *dict, const char *section, const char *key,  cons
     }
     return true;
 }
+
+bool set_key_value(dictionary *dict, const char *section, const char *key,  const char type, char *val)
+{
+    char section_key[256];
+    char s_val[256];
+    short s_tmp = 0;
+    int i_tmp = 0;
+    long l_tmp = 0;
+    long long ll_tmp = 0;
+    double d_tmp = 0.0;
+
+    switch(type)
+    {
+        case __bool:
+            sprintf(s_val, "%s", (*val ? "true" : "false"));
+            break;
+        case __char:
+            sprintf(s_val, "%d", *val);
+            break;
+        case __uchar:
+            sprintf(s_val, "%d", (unsigned char)*val);
+            break;
+        case __short:
+            memcpy(&s_tmp, val, sizeof(s_tmp));
+            sprintf(s_val, "%d", s_tmp);
+            break;
+        case __ushort:
+            memcpy(&s_tmp, val, sizeof(s_tmp));
+            sprintf(s_val, "%d", (unsigned short)s_tmp);
+            break;
+        case __int:
+            memcpy(&i_tmp, val, sizeof(i_tmp));
+            sprintf(s_val, "%d", i_tmp);
+            break;
+        case __uint:
+            memcpy(&i_tmp, val, sizeof(i_tmp));
+            sprintf(s_val, "%u", (unsigned int)i_tmp);
+            break;
+        case __long:
+            memcpy(&l_tmp, val, sizeof(l_tmp));
+            sprintf(s_val, "%ld", l_tmp);
+            break;
+        case __ulong:
+            memcpy(&l_tmp, val, sizeof(l_tmp));
+            sprintf(s_val, "%lu", (unsigned long)l_tmp);
+            break;
+        case __llong:
+            memcpy(&ll_tmp, val, sizeof(ll_tmp));
+            sprintf(s_val, "%lld", ll_tmp);
+            break;
+        case __ullong:
+            memcpy(&ll_tmp, val, sizeof(ll_tmp));
+            sprintf(s_val, "%llu", (unsigned long long)ll_tmp);
+            break;
+        case __double:
+            memcpy(&d_tmp, val, sizeof(d_tmp));
+            sprintf(s_val, "%f", d_tmp);
+            break;
+        case __str:
+            sprintf(s_val, "%s", val);
+            break;
+        default:
+            return false;
+    }
+    sprintf(section_key, "%s:%s", section, key);
+
+    if(iniparser_set(dict, section_key, (char *)s_val) < 0)
+    {
+        dbg_error("set [%s] error", section_key);
+        return false;
+    }
+    return true;
+}
+
+bool check_strtoll(long long val)
+{
+    if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))
+            || (errno != 0 && val == 0)) {
+        dbg_error("trans error");
+        return false;
+    }
+    return true;
+}
+bool check_strtod(double val)
+{
+    if ((errno == ERANGE && (val == HUGE_VALF || val == HUGE_VALL))
+            || (errno != 0 && val == 0.0)) {
+        dbg_error("trans error");
+        return false;
+    }
+    return true;
+}
+
+#define dbg 1
+
+bool strto_type_val(const char *s, char *val, const char type, int len)
+{
+    long long ll_tmp = 0;
+    double d_tmp = 0.0;
+    switch(type)
+    {
+        case __bool:
+            *val = strcmp(s, "true") ? false : true;
+#if dbg
+            dbg_print("__bool : %s", *val);
+#endif
+            break;
+        case __char:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                *val = (char)ll_tmp;
+            }
+#if dbg
+            dbg_print("source data : %lld", ll_tmp);
+            dbg_print("__char : %d", *val);
+#endif
+            break;
+        case __uchar:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((unsigned char *)val, (unsigned char *)&ll_tmp, sizeof(unsigned char));
+            }
+#if dbg
+            dbg_print("source data : %lld", ll_tmp);
+            dbg_print("__uchar : %d", (unsigned char)*val);
+#endif
+            break;
+        case __short:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((short *)val, (short *)&ll_tmp, sizeof(short));
+            }
+#if dbg
+            dbg_print("source data : %lld", ll_tmp);
+            dbg_print("__short : %d", (short)*val);
+#endif
+            break;
+        case __ushort:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((unsigned short *)val, (unsigned short *)&ll_tmp, sizeof(unsigned short));
+            }
+#if dbg
+            dbg_print("source data : %lld", ll_tmp);
+            dbg_print("__ushort : %d", (unsigned short)*val);
+#endif
+            break;
+        case __int:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((int *)val, (int *)&ll_tmp, sizeof(int));
+            }
+#if dbg
+            dbg_print("source data : %lld", ll_tmp);
+            dbg_print("__int : %d", (int)*val);
+#endif
+            break;
+        case __uint:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((unsigned int *)val, (unsigned int *)&ll_tmp, sizeof(unsigned int));
+            }
+#if dbg
+            dbg_print("source data : %lld", ll_tmp);
+            dbg_print("__uint : %u", (unsigned int)*val);
+#endif
+            break;
+        case __long:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((long *)val, (long *)&ll_tmp, sizeof(long));
+            }
+            break;
+        case __ulong:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((unsigned long *)val, (unsigned long *)&ll_tmp, sizeof(unsigned long));
+            }
+            break;
+        case __llong:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((long long *)val, (long long *)&ll_tmp, sizeof(long long));
+            }
+            break;
+        case __ullong:
+            ll_tmp = strtoll(s, NULL, 0);
+            if(check_strtoll(ll_tmp))
+            {
+                memcpy((unsigned long long *)val, (unsigned long long *)&ll_tmp, sizeof(unsigned long long));
+            }
+            break;
+        case __double:
+            d_tmp = strtod(s, NULL);
+            if(check_strtod(d_tmp))
+            {
+                memcpy((double *)val, (double *)&d_tmp, sizeof(double));
+            }
+            break;
+        case __str:
+            strncpy(val, s, len);
+#if dbg
+            dbg_print("__str : %s", val);
+#endif
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+#undef dbg
+
+
 bool get_key_value(dictionary *dict, const char *section, const char *key,  const char type, char *val, int len)
 {
     char *s = NULL;
@@ -81,8 +301,7 @@ bool get_key_value(dictionary *dict, const char *section, const char *key,  cons
         dbg_error("get [%s] error", section_key);
         return false;
     }
-    strncpy(val, s, len);
-    return true;
+    return strto_type_val((const char *)s, val, type, len);
 }
 bool __ini_save(const char *ini_name, dictionary *dict)
 {
