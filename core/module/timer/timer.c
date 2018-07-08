@@ -76,7 +76,7 @@ static char *s_time_strformat(struct tm *tm, char *str)
         return NULL;
     }
 #if CUR_LANG_ZH
-	sprintf((char *)str, "%d年 %d月 %d日 %s %d:%d:%d\n", \
+	sprintf((char *)str, "%d年 %d月 %d日 %s %d:%d:%d", \
 			tm->tm_year + 1900, \
 			tm->tm_mon + 1, \
 			tm->tm_mday, \
@@ -85,7 +85,7 @@ static char *s_time_strformat(struct tm *tm, char *str)
 			tm->tm_min, \
 			tm->tm_sec);
 #else
-	sprintf((char *)str, "%d %d %d %s %d:%d:%d\n", \
+	sprintf((char *)str, "%d %d %d %s %d:%d:%d", \
 			tm->tm_year + 1900, \
 			tm->tm_mon + 1, \
 			tm->tm_mday, \
@@ -115,7 +115,7 @@ char *m_getostimestr(char *str)
 void m_print_ostime(void)
 {
     char str[1024];
-    printf("%s", m_getostimestr(str));
+    printf("%s\n", m_getostimestr(str));
 }
 
 /* 打印一个月的月历 */

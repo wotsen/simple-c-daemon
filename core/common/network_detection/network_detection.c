@@ -24,6 +24,10 @@
 #include "../common.h"
 
 static int s_socket = -1;
+unsigned short g_local_udp_port = DAEMON_SERVER_PORT;
+unsigned short g_application_udp_port = APPLICATION_PORT;
+unsigned short g_local_ssl_port = DAEMON_SSL_PORT;
+unsigned short g_application_ssl_port = APPLICATION_SSL_PORT;
 
 static char udp_buf[NET_DATA_LEN_MAX];
 
@@ -107,15 +111,25 @@ static void send_normal_packet(void)
     //dbg_print("heart-beat : %s", json_object_to_json_string_ext(obj_send, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
     //dbg_print("%s  | str_len = %d, real_len = %d", send_js_str, len, strlen(send_js_str));
 
-    m_udpsock_send(s_socket, NULL, APPLICATION_PORT, send_js_str, len);
+    m_udpsock_send(s_socket, NULL, g_application_udp_port, send_js_str, len);
     json_object_put(obj_send);
 
     return;
 }
 
-static int create_udp_simple(void)
+
+static void deal_udp_data(int len, struct sockaddr_in sin)
 {
-    return m_udpsock_create(NULL, NULL, DAEMON_SERVER_PORT, 2, 5);
+    struct json_object *obj_recv = NULL;
+    enum json_tokener_error error;
+    obj_recv = json_tokener_parse_verbose(udp_buf, &error);
+    if(error != json_tokener_success)
+    {
+        dbg_error("udp recv error : [%d]", error);
+        return;
+    }
+    dbg_print("recv : %s", json_object_to_json_string_ext(obj_recv, JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
+    json_object_put(obj_recv);
 }
 
 static bool check_recv_udp_data(int len)
@@ -136,55 +150,9 @@ static bool check_recv_udp_data(int len)
     return false;
 }
 
-static bool check_udp_data_crc(int len)
+static int create_udp_simple(void)
 {
-    unsigned short crc = 0;
-    memcpy(&crc, &udp_buf[len-2], 2);
-    return true;
-}
-
-static class_pack_head *unpack_udp_data(int len)
-{
-    class_pack_head *packet = NULL;
-    if(!check_udp_data_crc(len))
-    {
-        return NULL;
-    }
-
-    packet = (class_pack_head *)m_memory_alloc(NET_DATA_LEN_MAX);
-    memcpy(packet, udp_buf, len-2);
-
-    if(((len - packet->len) != 2) ||
-            packet->ack != ACK_INIT)
-    {
-        free(packet);
-        return NULL;
-    }
-    return packet;
-}
-
-static void deal_udp_data(int len, struct sockaddr_in sin)
-{
-    class_pack_head *packet = NULL;
-
-    if(len < (PACK_HEAD_LEN + 2))
-    {
-        return;
-    }
-    if(NULL == (packet = unpack_udp_data(len)))
-    {
-        return;
-    }
-    switch(packet->module){
-        case LOCAL_SYNC_MODULE:
-            break;
-        case NET_SYNC_MODULE:
-            break;
-        default:
-            break;
-    }
-    dbg_print("udp-recv : ip = %s port = %d | %s", &sin.sin_addr.s_addr, ntohs(sin.sin_port), udp_buf);
-    free(packet);
+    return m_udpsock_create(NULL, NULL, g_local_udp_port, 2, 5);
 }
 
 static void network_task(void)

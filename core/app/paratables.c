@@ -23,29 +23,33 @@
 #include "../common/file_ops/file_ops.h"
 #include "../common/zlog_service/zlog_service.h"
 #include "def_paras.h"
+#include "def_system_base.h"
+#include "def_application.h"
+#include "extern_para.h"
 
 static dictionary *para_ini = NULL;
 
-char test_base_path[60];
-unsigned char test_uint8 = 0;
-short test_int16 = 0;
-unsigned short test_uint16 = 0;
-int test_int32 = 0;
-unsigned int test_uint32 = 0;
-
 class_para system_base_para[] = {
-    {KEY_OS_TYPE,   20,  __str,     rw,     NULL,            NULL,           NULL,       NULL,       default_key_tail},
-    {KEY_CONF_DIR,  60,  __str,     w_,     BASE_PATH,       test_base_path,           NULL,       NULL,       default_key_tail},
-    {{"test-uint8", 0},  1,  __uchar,     w_,     "0xff",  (char *)&test_uint8,           NULL,       NULL,       default_key_tail},
-    {{"test-int16", 0},  2,  __short,     w_,     "-55", (char *)&test_int16,           NULL,       NULL,       default_key_tail},
-    {{"test-uint16", 0},  2,  __ushort,     w_,   "0xffff", (char *)&test_uint16,           NULL,       NULL,       default_key_tail},
-    {{"test-int32", 0},  4,  __int,     w_,     "-65538",       (char *)&test_int32,           NULL,       NULL,       default_key_tail},
-    {{"test-uint32", 0},  4,  __uint,     w_,     "0xffffffff",       (char *)&test_uint32,           NULL,       NULL,       default_key_tail},
+    {KEY_OS_TYPE,               20,     __str,     r_, NULL,        NULL,               NULL,               NULL,           default_key_tail},
+    PARA_END
+};
+
+class_para applications_para[] = {
+    {KEY_TX_MYSQL_PASS,         40,     __str,     r_, NULL,        NULL,               NULL,               NULL,           default_key_tail},
+    {KEY_COMMON_ACC_PASS,       40,     __str,     r_, NULL,        NULL,               NULL,               NULL,           default_key_tail},
+
+    /* net */
+    {KEY_LOCAL_UDP_PORT,        2,      __ushort,  rw, "6000",      &g_local_udp_port,                      NULL,               NULL,           default_key_tail},
+    {KEY_DJANGO_UDP_PORT,       2,      __ushort,  rw, "6002",      &g_application_udp_port,                NULL,               NULL,           default_key_tail},
+    {KEY_LOCAL_SSL_PORT,        2,      __ushort,  rw, "7000",      &g_local_ssl_port,                      NULL,               NULL,           default_key_tail},
+    {KEY_DJANGO_SSL_PORT,       2,      __ushort,  rw, "7002",      &g_application_ssl_port,                NULL,               NULL,           default_key_tail},
+
     PARA_END
 };
 
 class_module __modules[] = {
-    {SEC_SYSTEM_BASE,     ID_SYSTEM_BASE,    system_base_para,   NULL,   NULL},
+    {SEC_SYSTEM_BASE,       ID_SYSTEM_BASE,     system_base_para,       NULL,       NULL},
+    {SEC_APPLICATION,       ID_APPLICATION,     applications_para,      NULL,       NULL},
     MODULE_END
 };
 
@@ -71,7 +75,9 @@ bool ini_para_key(const char *section, const char *key, char *val)
 }
 bool set_para_key(const char *section, const char *key, const char type, char *val)
 {
-    return set_key_value(para_ini, section, key, type, val);
+    if(set_key_value(para_ini, section, key, type, val))
+        return __ini_save(PARATABLE_INI, para_ini);
+    return false;
 }
 bool get_para_key(const char *section, const char *key, const char type, char *val, int len)
 {
@@ -90,8 +96,6 @@ void open_para_ini(void)
     fclose(fd);
 
     para_ini = __ini_parse(PARATABLE_INI);
-//    __ini_save(PARATABLE_INI, para_ini);
-//    iniparser_freedict(para_ini);
 }
 
 void para_initial(void)
@@ -115,7 +119,7 @@ void para_initial(void)
                                 (const char)__modules[i].para_table[j].type, __modules[i].para_table[j].len);
                     }
                 }
-                if(NULL != __modules[i].para_table[j].address){
+                else if(NULL != __modules[i].para_table[j].address){
                     get_para_key(__modules[i].section, __modules[i].para_table[j].id.name, \
                             (const char)__modules[i].para_table[j].type, (char *)__modules[i].para_table[j].address,\
                             __modules[i].para_table[j].len);
@@ -123,10 +127,5 @@ void para_initial(void)
             }
         }
     }
-    dbg_print("val : %d", test_uint8);
-    dbg_print("val : %d", test_int16);
-    dbg_print("val : %d", test_uint16);
-    dbg_print("val : %d", test_int32);
-    dbg_print("val : %u", test_uint32);
     __ini_save(PARATABLE_INI, para_ini);
 }

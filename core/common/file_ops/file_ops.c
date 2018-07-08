@@ -161,7 +161,7 @@ bool check_strtod(double val)
     return true;
 }
 
-#define dbg 1
+
 
 bool strto_type_val(const char *s, char *val, const char type, int len)
 {
@@ -171,9 +171,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
     {
         case __bool:
             *val = strcmp(s, "true") ? false : true;
-#if dbg
-            dbg_print("__bool : %s", *val);
-#endif
             break;
         case __char:
             ll_tmp = strtoll(s, NULL, 0);
@@ -181,10 +178,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             {
                 *val = (char)ll_tmp;
             }
-#if dbg
-            dbg_print("source data : %lld", ll_tmp);
-            dbg_print("__char : %d", *val);
-#endif
             break;
         case __uchar:
             ll_tmp = strtoll(s, NULL, 0);
@@ -192,10 +185,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             {
                 memcpy((unsigned char *)val, (unsigned char *)&ll_tmp, sizeof(unsigned char));
             }
-#if dbg
-            dbg_print("source data : %lld", ll_tmp);
-            dbg_print("__uchar : %d", (unsigned char)*val);
-#endif
             break;
         case __short:
             ll_tmp = strtoll(s, NULL, 0);
@@ -203,10 +192,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             {
                 memcpy((short *)val, (short *)&ll_tmp, sizeof(short));
             }
-#if dbg
-            dbg_print("source data : %lld", ll_tmp);
-            dbg_print("__short : %d", (short)*val);
-#endif
             break;
         case __ushort:
             ll_tmp = strtoll(s, NULL, 0);
@@ -214,10 +199,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             {
                 memcpy((unsigned short *)val, (unsigned short *)&ll_tmp, sizeof(unsigned short));
             }
-#if dbg
-            dbg_print("source data : %lld", ll_tmp);
-            dbg_print("__ushort : %d", (unsigned short)*val);
-#endif
             break;
         case __int:
             ll_tmp = strtoll(s, NULL, 0);
@@ -225,10 +206,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             {
                 memcpy((int *)val, (int *)&ll_tmp, sizeof(int));
             }
-#if dbg
-            dbg_print("source data : %lld", ll_tmp);
-            dbg_print("__int : %d", (int)*val);
-#endif
             break;
         case __uint:
             ll_tmp = strtoll(s, NULL, 0);
@@ -236,10 +213,6 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             {
                 memcpy((unsigned int *)val, (unsigned int *)&ll_tmp, sizeof(unsigned int));
             }
-#if dbg
-            dbg_print("source data : %lld", ll_tmp);
-            dbg_print("__uint : %u", (unsigned int)*val);
-#endif
             break;
         case __long:
             ll_tmp = strtoll(s, NULL, 0);
@@ -278,9 +251,9 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             break;
         case __str:
             strncpy(val, s, len);
-#if dbg
-            dbg_print("__str : %s", val);
-#endif
+            break;
+        case __void:
+            memcpy(val, s, len);
             break;
         default:
             return false;

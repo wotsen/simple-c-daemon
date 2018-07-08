@@ -12,6 +12,7 @@ s.bind((HOST,PORT))
 while True:
     data, addr = s.recvfrom(1024)
     print(json.loads(str(data, encoding='utf-8')))
+    s.sendto(data, addr)
     time.sleep(2)
 
 s.close()

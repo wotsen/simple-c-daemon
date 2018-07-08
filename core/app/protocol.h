@@ -18,6 +18,11 @@
 
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
+
+#include <json-c/json.h>
+
+#include "../module/def.h"
+#include "../module/bool.h"
 #include "../module//tools/tools.h"
 
 typedef struct {
@@ -51,5 +56,11 @@ typedef struct {
     char *(*exec)(void);
     void (*def_function)(void);
 }PACKED class_module;
+
+
+
+bool unpack_json_head(struct json_object *packet);
+bool unpack_json_module(struct json_object *packet, struct json_object *module);
+bool unpack_json_key(struct json_object *packet, struct json_object *module, struct json_object *key);
 
 #endif

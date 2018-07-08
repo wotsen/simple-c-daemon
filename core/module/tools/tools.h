@@ -39,6 +39,15 @@ int s_byte_to_sint(const unsigned char *byte, unsigned int len);
 char *m_digit_to_ascii(char *ascii, const unsigned char *digit, unsigned int len);
 unsigned int m_ascii_to_hex(unsigned char *hex, const char *ascii, unsigned int len);
 
+#define MAX_INT8    128
+#define MAX_UINT8   (MAX_INT8 * 2 -1)
+#define MAX_INT16   32768
+#define MAX_UINT16  (MAX_INT16 * 2 -1)
+#define MAX_INT32   2147483648
+#define MAX_UINT32  (MAX_INT32 * 2 - 1)
+#define MAX_INT64   9223372036854775808l
+#define MAX_UINT64  18446744073709551615ul
+
 #define m_byte_to_word(byte)	s_byte_to_int(byte, 2)	/* 两个字节的数组转换成整型数 */
 #define m_byte_to_int24(byte)	s_byte_to_int(byte, 3)	/* 三个字节的数组转换成整型数 */
 #define m_byte_to_long(byte)	s_byte_to_int(byte, 4)	/* 四个字节的数组转换成整型数 */

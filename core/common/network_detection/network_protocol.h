@@ -10,6 +10,9 @@
 #define VER_CENTER_PORT         6001
 #define APPLICATION_PORT        6002
 
+#define DAEMON_SSL_PORT         7000
+#define APPLICATION_SSL_PORT    7002
+
 #define NET_DATA_LEN_MAX        1024
 
 #define LOCAL_SYNC_MODULE       0x0001
