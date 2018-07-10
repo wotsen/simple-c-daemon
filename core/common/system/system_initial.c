@@ -54,6 +54,7 @@ char *os_machine(void)
 }
 
 extern void para_initial(void);
+extern void network_initial();
 
 void config_initial(void)
 {
@@ -65,4 +66,5 @@ void system_initial(void)
     __uname();
     config_initial();
     para_initial();
+    network_initial();
 }

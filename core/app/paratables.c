@@ -25,6 +25,7 @@
 #include "def_paras.h"
 #include "def_system_base.h"
 #include "def_application.h"
+#include "def_network.h"
 #include "extern_para.h"
 
 static dictionary *para_ini = NULL;
@@ -47,11 +48,45 @@ class_para applications_para[] = {
     PARA_END
 };
 
+class_para network_para[] = {
+    {KEY_HEART_BEAT,            4096,   __void,    r_, NULL,        NULL,               NULL,               NULL,           default_key_tail},
+
+    PARA_END
+};
+
 class_module __modules[] = {
     {SEC_SYSTEM_BASE,       ID_SYSTEM_BASE,     system_base_para,       NULL,       NULL},
     {SEC_APPLICATION,       ID_APPLICATION,     applications_para,      NULL,       NULL},
+    {SEC_NETWORK,           ID_NETWORK,         network_para,           NULL,       NULL},
     MODULE_END
 };
+
+class_para *get_para_by_id(class_para *para_tables, class_para_head id)
+{
+    class_para *para = para_tables;
+    for(; NULL != para->id.name; para++)
+    {
+        if(para->id.id == id.id)
+        {
+            return para;
+        }
+    }
+    return NULL;
+}
+
+class_module *get_module_by_id(unsigned char id)
+{
+    class_module *module = __modules;
+    for(; NULL != __modules->section; module++)
+    {
+        if(module->id == id)
+        {
+            return module;
+        }
+    }
+    return NULL;
+}
+
 
 bool check_para_key(const char *section, const char *key)
 {

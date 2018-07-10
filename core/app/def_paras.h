@@ -27,6 +27,7 @@
 /* section */
 #define SEC_SYSTEM_BASE                 "system_base"
 #define SEC_APPLICATION                 "application"
+#define SEC_NETWORK                     "network"
 
 /* para head */
 
@@ -35,5 +36,6 @@
 /* modules id */
 #define ID_SYSTEM_BASE                  0x1
 #define ID_APPLICATION                  0x2
+#define ID_NETWORK                      0x3
 
 #endif
