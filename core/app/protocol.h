@@ -25,6 +25,17 @@
 #include "../module/bool.h"
 #include "../module//tools/tools.h"
 
+
+/* module-cmd */
+#define GET_CMD             0x01
+#define SET_CMD             0x02
+#define HEART_CMD           0x03
+#define END_CMD             0xFF
+
+#define ACK_INIT            0xFF
+#define ACK_OK              0x0
+#define ACK_ERR             0x1
+
 typedef struct {
     const char *name;
     const unsigned short id;
@@ -33,7 +44,7 @@ typedef struct {
 typedef struct {
 #define PARA_END    {{NULL, 0xFFFF}, 0, 0xf, 0xFF, NULL, NULL, NULL, NULL, NULL, 0xFFFF, 0, 0, 0}
    class_para_head id; 
-   const unsigned char len;
+   const unsigned int len;
    const char type;
    const unsigned char permission;
    const char *init_val;
@@ -46,19 +57,27 @@ typedef struct {
    int para2;
    int para3;
 }PACKED class_para;
+class_para *get_para_by_id(class_para *para_tables, class_para_head id);
+struct json_object *pack_json_para(class_para *para, char *val);
+struct json_object *pack_key_end(struct json_object *packet);
 
 
 typedef struct {
 #define MODULE_END  {NULL, 0xFF, NULL, NULL, NULL}
     const char *section;
     const unsigned char id;
-        class_para *para_table;
+    class_para *para_table;
     char *(*exec)(void);
     void (*def_function)(void);
 }PACKED class_module;
+class_module *get_module_by_id(unsigned char id);
 
+struct os_base_info {
+    const char *key;
+    char *(*get)();
+};
 
-
+struct json_object *packet_json(class_module *module);
 bool unpack_json_head(struct json_object *packet);
 bool unpack_json_module(struct json_object *packet, struct json_object *module);
 bool unpack_json_key(struct json_object *packet, struct json_object *module, struct json_object *key);
