@@ -54,7 +54,7 @@ class_para network_para[] = {
     PARA_END
 };
 
-class_module __modules[] = {
+class_module _modules[] = {
     {SEC_SYSTEM_BASE,       ID_SYSTEM_BASE,     system_base_para,       NULL,       NULL},
     {SEC_APPLICATION,       ID_APPLICATION,     applications_para,      NULL,       NULL},
     {SEC_NETWORK,           ID_NETWORK,         network_para,           NULL,       NULL},
@@ -66,23 +66,17 @@ class_para *get_para_by_id(class_para *para_tables, class_para_head id)
     class_para *para = para_tables;
     for(; NULL != para->id.name; para++)
     {
-        if(para->id.id == id.id)
-        {
-            return para;
-        }
+        if(para->id.id == id.id) { return para; }
     }
     return NULL;
 }
 
 class_module *get_module_by_id(unsigned char id)
 {
-    class_module *module = __modules;
-    for(; NULL != __modules->section; module++)
+    class_module *module = _modules;
+    for(; NULL != _modules->section; module++)
     {
-        if(module->id == id)
-        {
-            return module;
-        }
+        if(module->id == id) { return module; }
     }
     return NULL;
 }
@@ -111,7 +105,7 @@ bool ini_para_key(const char *section, const char *key, char *val)
 bool set_para_key(const char *section, const char *key, const char type, char *val)
 {
     if(set_key_value(para_ini, section, key, type, val))
-        return __ini_save(PARATABLE_INI, para_ini);
+        return ini_save(PARATABLE_INI, para_ini);
     return false;
 }
 bool get_para_key(const char *section, const char *key, const char type, char *val, int len)
@@ -122,7 +116,7 @@ bool get_para_key(const char *section, const char *key, const char type, char *v
 void open_para_ini(void)
 {
     FILE *fd = NULL;
-    fd = __open_file(PARATABLE_INI);
+    fd = open_file(PARATABLE_INI);
     if(NULL == fd)
     {
        dbg_error("can not open : [%s]", PARATABLE_INI); 
@@ -130,37 +124,49 @@ void open_para_ini(void)
     }
     fclose(fd);
 
-    para_ini = __ini_parse(PARATABLE_INI);
+    para_ini = ini_parse(PARATABLE_INI);
 }
 
 void para_initial(void)
 {
     int i = 0;
     int j = 0;
-    for(i = 0; NULL != __modules[i].section; i++)
+    for(i = 0; NULL != _modules[i].section; i++)
     {
-        if(!check_module_section(__modules[i].section)){
-            create_module_section(__modules[i].section);
+        if(!check_module_section(_modules[i].section)){
+            create_module_section(_modules[i].section);
         }
-        for(j = 0; NULL != __modules[i].para_table[j].id.name; j++)
+        for(j = 0; NULL != _modules[i].para_table[j].id.name; j++)
         {
-            if(NULL != __modules[i].para_table[j].init_val){
-                if(!check_para_key(__modules[i].section, __modules[i].para_table[j].id.name)){
-                    ini_para_key(__modules[i].section, __modules[i].para_table[j].id.name, \
-                            (char *)__modules[i].para_table[j].init_val);
-                    if(NULL != __modules[i].para_table[j].address){
-                        strto_type_val((const char *)__modules[i].para_table[j].init_val, \
-                                (char *)__modules[i].para_table[j].address, \
-                                (const char)__modules[i].para_table[j].type, __modules[i].para_table[j].len);
+            if(NULL != _modules[i].para_table[j].init_val)
+            {
+                if(!check_para_key(_modules[i].section,
+                                   _modules[i].para_table[j].id.name))
+                {
+                    ini_para_key(
+                            _modules[i].section, 
+                            _modules[i].para_table[j].id.name,
+                            (char *)_modules[i].para_table[j].init_val);
+                    if(NULL != _modules[i].para_table[j].address)
+                    {
+                        strto_type_val(
+                            (const char *)_modules[i].para_table[j].init_val,
+                            (char *)_modules[i].para_table[j].address,
+                            (const char)_modules[i].para_table[j].type, 
+                            _modules[i].para_table[j].len);
                     }
                 }
-                else if(NULL != __modules[i].para_table[j].address){
-                    get_para_key(__modules[i].section, __modules[i].para_table[j].id.name, \
-                            (const char)__modules[i].para_table[j].type, (char *)__modules[i].para_table[j].address,\
-                            __modules[i].para_table[j].len);
+                else if(NULL != _modules[i].para_table[j].address)
+                {
+                    get_para_key(
+                            _modules[i].section, 
+                            _modules[i].para_table[j].id.name,
+                            (const char)_modules[i].para_table[j].type, 
+                            (char *)_modules[i].para_table[j].address,
+                            _modules[i].para_table[j].len);
                 }
             }
         }
     }
-    __ini_save(PARATABLE_INI, para_ini);
+    ini_save(PARATABLE_INI, para_ini);
 }

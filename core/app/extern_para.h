@@ -15,9 +15,11 @@
 #ifndef _EXTERN_PARA_H
 #define _EXTERN_PARA_H
 
-extern unsigned short g_local_udp_port;
-extern unsigned short g_application_udp_port;
-extern unsigned short g_local_ssl_port;
-extern unsigned short g_application_ssl_port;
+#include <inttypes.h>
+
+extern uint16_t g_local_udp_port;
+extern uint16_t g_application_udp_port;
+extern uint16_t g_local_ssl_port;
+extern uint16_t g_application_ssl_port;
 
 #endif

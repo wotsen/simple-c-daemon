@@ -17,6 +17,7 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "../module/module.h"
 #include "../common/common.h"
@@ -79,10 +80,14 @@ struct json_object *pack_json_para(class_para *para, char *val)
     struct json_object *key = json_object_new_object();
     char str[256];
 
-    json_object_object_add(key, "key-name", json_object_new_string(para->id.name));
-    json_object_object_add(key, "key-id", json_object_new_int(para->id.id));
-    json_object_object_add(key, "key-len", json_object_new_int(para->len));
-    json_object_object_add(key, "key-type", json_object_new_int(para->type));
+    json_object_object_add(key, "key-name", 
+                           json_object_new_string(para->id.name));
+    json_object_object_add(key, "key-id", 
+                           json_object_new_int(para->id.id));
+    json_object_object_add(key, "key-len", 
+                           json_object_new_int(para->len));
+    json_object_object_add(key, "key-type", 
+                           json_object_new_int(para->type));
     
     if(!para->len)
         return key;
@@ -90,44 +95,57 @@ struct json_object *pack_json_para(class_para *para, char *val)
     switch(para->type)
     {
         case __bool:
-            json_object_object_add(key, "context", json_object_new_string(*val ? "true" : "false"));
+            json_object_object_add(key, "context",
+                        json_object_new_string(*val ? "true" : "false"));
             break;
         case __char:
-            json_object_object_add(key, "context", json_object_new_int(*val));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*val));
             break;
         case __uchar:
-            json_object_object_add(key, "context", json_object_new_int(*((unsigned char*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((uint8_t*)val)));
             break;
         case __short:
-            json_object_object_add(key, "context", json_object_new_int(*((short*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((int16_t*)val)));
             break;
         case __ushort:
-            json_object_object_add(key, "context", json_object_new_int(*((unsigned short*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((uint16_t*)val)));
             break;
         case __int:
-            json_object_object_add(key, "context", json_object_new_int(*((int*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((int32_t*)val)));
             break;
         case __uint:
-            json_object_object_add(key, "context", json_object_new_int(*((unsigned int*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((uint32_t*)val)));
             break;
         case __long:
-            json_object_object_add(key, "context", json_object_new_int(*((long*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((long*)val)));
             break;
         case __ulong:
-            json_object_object_add(key, "context", json_object_new_int(*((unsigned long*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int(*((unsigned long*)val)));
             break;
         case __llong:
-            json_object_object_add(key, "context", json_object_new_int64(*((long long*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int64(*((long long*)val)));
             break;
         case __ullong:
-            json_object_object_add(key, "context", json_object_new_int64(*((unsigned long long*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_int64(*((unsigned long long*)val)));
             break;
         case __double:
-            json_object_object_add(key, "context", json_object_new_double(*((double*)val)));
+            json_object_object_add(key, "context", 
+                        json_object_new_double(*((double*)val)));
             break;
         default:
             sprintf(str, "%s", val);
-            json_object_object_add(key, "context", json_object_new_string(str));
+            json_object_object_add(key, "context", 
+                        json_object_new_string(str));
             break;
     }
 
@@ -136,17 +154,18 @@ struct json_object *pack_json_para(class_para *para, char *val)
 
 struct json_object *pack_json_head()
 {
-    int i = 0;
+    int32_t i = 0;
     char time[256];
     struct json_object *obj = json_object_new_object();
     struct json_object *hobj = json_object_new_object();
 
     memset(time, 0, sizeof(time));
-    m_getostimestr(time);
+    getostimestr(time);
 
     for(i = 0; NULL != system_uname[i].key; i++)
     {
-        json_object_object_add(hobj, system_uname[i].key, json_object_new_string(system_uname[i].get()));
+        json_object_object_add(hobj, system_uname[i].key, 
+                               json_object_new_string(system_uname[i].get()));
     }
     json_object_object_add(hobj, "cur-time", json_object_new_string(time));
     json_object_object_add(obj, "head", hobj);
@@ -154,17 +173,26 @@ struct json_object *pack_json_head()
     return obj;
 }
 
-struct json_object *pack_json_module(struct json_object *packet, class_module *module)
+struct json_object *pack_json_module(
+                    struct json_object *packet,
+                    class_module *module)
 {
     struct json_object *mobj = json_object_new_object();
 
-    json_object_object_add(mobj, "src", json_object_new_string("none"));
-    json_object_object_add(mobj, "dest", json_object_new_string("none"));
-    json_object_object_add(mobj, "module-name", json_object_new_string(module->section));
-    json_object_object_add(mobj, "module-id", json_object_new_int(module->id));
-    json_object_object_add(mobj, "module-len", json_object_new_int(0));
-    json_object_object_add(mobj, "module-ack", json_object_new_int(ACK_INIT));
-    json_object_object_add(mobj, "module-cmd", json_object_new_int(0));
+    json_object_object_add(mobj, "src",
+                           json_object_new_string("none"));
+    json_object_object_add(mobj, "dest", 
+                           json_object_new_string("none"));
+    json_object_object_add(mobj, "module-name",
+                           json_object_new_string(module->section));
+    json_object_object_add(mobj, "module-id",
+                           json_object_new_int(module->id));
+    json_object_object_add(mobj, "module-len",
+                           json_object_new_int(0));
+    json_object_object_add(mobj, "module-ack",
+                           json_object_new_int(ACK_INIT));
+    json_object_object_add(mobj, "module-cmd",
+                           json_object_new_int(0));
 
     json_object_object_add(packet, "module", mobj);
 
@@ -174,18 +202,20 @@ struct json_object *pack_json_module(struct json_object *packet, class_module *m
 struct json_object *packet_json(class_module *module)
 {
     struct json_object *packet = pack_json_head();
+
     pack_json_module(packet, module);
+
     return packet;
 }
-/************************************************************************************************************************/
+
+
 bool unpack_json_head(struct json_object *packet)
 {
     struct json_object *head = json_object_object_get(packet, "head");
     struct json_object *module = json_object_object_get(packet, "module");
-    if((NULL == head) || (NULL == module))
-    {
-        return false;
-    }
+
+    if(!head || !module) { return false; }
+
     return unpack_json_module(packet, module);
 }
 
@@ -194,21 +224,18 @@ bool unpack_json_module(struct json_object *packet, struct json_object *module)
     struct json_object *key = NULL;
     struct json_object *key_len = NULL;
     char key_name[125];
-    int len = 0;
-    int i = 1;
+    int32_t len = 0;
+    int32_t i = 1;
     bool ret = true;
 
-    if(NULL == (key_len = json_object_object_get(module, "len")))
-    {
+    if(!(key_len = json_object_object_get(module, "len"))) {
         return false;
     }
-    if(0 == (len = json_object_get_int(key_len)))
-    {
-        return false;
-    }
+    if(!(len = json_object_get_int(key_len))) { return false; }
+
     do{
         sprintf(key_name, "key-%d", i);
-        if(NULL == (key = json_object_object_get(packet, (const char *)key_name)))
+        if(!(key = json_object_object_get(packet, (const char *)key_name)))
         {
             return false;
         }
@@ -218,10 +245,13 @@ bool unpack_json_module(struct json_object *packet, struct json_object *module)
         }
         i++;
     }while(i <= len);
+
     return ret;
 }
 
-bool unpack_json_key(struct json_object *packet, struct json_object *module, struct json_object *key)
+bool unpack_json_key(struct json_object *packet,
+                     struct json_object *module, 
+                     struct json_object *key)
 {
     return true;
 }

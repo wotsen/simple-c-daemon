@@ -26,17 +26,27 @@
 #define LV_FATAL    ZLOG_LEVEL_FATAL
 
 
-void s_system_log(char lv, const char *format, ...);
-void s_user_log(char lv, const char *format, ...);
-void s_dbg_log(char lv, const char *format, ...);
+void _system_log(char lv, const char *format, ...);
+void _user_log(char lv, const char *format, ...);
+void _dbg_log(char lv, const char *format, ...);
 
-#define dbg_print(fmt, args...)     s_dbg_log(LV_DEBUG, fmt, ##args)
-#define dbg_error(fmt, args...)     s_dbg_log(LV_ERROR, "file: %s fun: %s line : %d] "fmt, __FILE__, __func__,  __LINE__, ##args)
-#define dbg_log(fmt, args...)       s_dbg_log(LV_FATAL, "file: %s fun: %s line : %d] "fmt, __FILE__, __func__,  __LINE__, ##args)
+#define dbg_print(fmt, args...)     \
+        _dbg_log(LV_DEBUG, fmt, ##args)
+#define dbg_error(fmt, args...)     \
+        _dbg_log(LV_ERROR, "file: %s fun: %s line : %d] " fmt,\
+                  __FILE__, __func__,  __LINE__, ##args)
+#define dbg_log(fmt, args...)       \
+        _dbg_log(LV_FATAL, "file: %s fun: %s line : %d] " fmt,\
+                  __FILE__, __func__,  __LINE__, ##args)
 
-#define system_log(lv, fmt, args...) s_system_log(lv, "file: %s fun: %s line : %d] "fmt, __FILE__, __func__,  __LINE__, ##args)
-#define user_log(lv, fmt, args...)   s_user_log(lv, "file: %s fun: %s line : %d] "fmt, __FILE__, __func__,  __LINE__, ##args)
-#define system_info(fmt, args...)   s_system_log(LV_INFO, fmt, ##args)
+#define system_log(lv, fmt, args...) \
+        _system_log(lv, "file: %s fun: %s line : %d] " fmt,   \
+                     __FILE__, __func__,  __LINE__, ##args)
+#define user_log(lv, fmt, args...)   \
+        _user_log(lv, "file: %s fun: %s line : %d] " fmt,     \
+                   __FILE__, __func__,  __LINE__, ##args)
+#define system_info(fmt, args...)   \
+        _system_log(LV_INFO, fmt, ##args)
 
 #endif
 

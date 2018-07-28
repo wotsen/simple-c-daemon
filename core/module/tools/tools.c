@@ -13,10 +13,10 @@
 #include <errno.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #include <linux/types.h>
 
-#include "../bool.h"
 #include "tools.h"
 
 /* 申请内存 */
@@ -24,10 +24,10 @@
 size:申请的内存大小
 return:内存首地址
  */
-void *m_memory_alloc(unsigned int size)
+void *memory_alloc(uint32_t size)
 {
 	void *addr;
-    int memcount = 200*1000;    /* 1秒钟申请不到返回 */
+    int32_t memcount = 200*1000;    /* 1秒钟申请不到返回 */
 	while((addr = malloc(size)) == NULL)
 	{
         if(!memcount)
@@ -47,10 +47,10 @@ addr:新内存首地址
 len:需要保存的内存内容长度
 return:新内存首地址
  */
-void *m_memory_realloc(unsigned int new_size, void *old, void *addr, unsigned int len)
+void *memory_realloc(uint32_t new_size, void *old, void *addr, uint32_t len)
 {
 	void *new_ptr;
-	if(NULL == (new_ptr = m_memory_alloc(new_size)))
+	if(NULL == (new_ptr = memory_alloc(new_size)))
         return new_ptr;
 	if(len)
 	{
@@ -66,17 +66,17 @@ cmd:命令名称
 args:命令参数
 return:执行结果返回
  */
-unsigned char  m_system_cmd(const char *cmd, const char *args)
+uint8_t  system_cmd(const char *cmd, const char *args)
 {
-	if(cmd == NULL)
-		return false;
+	if(!cmd) { return false; }
 	pid_t status;
 	char cmd_or_output[255];
 	memset(cmd_or_output, 0, sizeof(cmd_or_output));
-	if(NULL != args)
+	if(args){
 		sprintf(cmd_or_output, "%s %s", cmd, args);
-	else
+    }else{
 		sprintf(cmd_or_output, "%s", cmd);
+    }
 	memset(cmd_or_output, 0, sizeof(cmd_or_output));
 	if((status = system(cmd_or_output)) == -1)
 	{
@@ -89,22 +89,25 @@ unsigned char  m_system_cmd(const char *cmd, const char *args)
 	{
 		if(WIFEXITED(status))
 		{
-			if(0 == WEXITSTATUS(status))
+			if(!WEXITSTATUS(status))
 			{
-				sprintf(cmd_or_output, "脚本执行成功[%d,%d,0x%X]\r\n", errno, WEXITSTATUS(status), status);
+				sprintf(cmd_or_output, "脚本执行成功[%d,%d,0x%X]\r\n",
+                        errno, WEXITSTATUS(status), status);
 #if dbg
 				printf("%s", cmd_or_output);
 #endif
 				return true;
 			}
-			sprintf(cmd_or_output, "脚本执行失败[%d,%d,0x%X]\r\n", errno, WEXITSTATUS(status), status);
+			sprintf(cmd_or_output, "脚本执行失败[%d,%d,0x%X]\r\n",
+                    errno, WEXITSTATUS(status), status);
 #if dbg
 			printf("%s", cmd_or_output);
 #endif
 		}
 		else
 		{
-			sprintf(cmd_or_output, "错误退出[%d,%d,0x%X]\r\n", errno, WEXITSTATUS(status), status);
+			sprintf(cmd_or_output, "错误退出[%d,%d,0x%X]\r\n",
+                    errno, WEXITSTATUS(status), status);
 #if dbg
 			printf("%s", cmd_or_output);
 #endif
@@ -114,15 +117,15 @@ unsigned char  m_system_cmd(const char *cmd, const char *args)
 }
 #undef dbg
 /*系统重启*/
-void m_system_reboot(void)
+void system_reboot(void)
 {
 	while(1)
 	{
         sleep(2);
-		m_system_cmd("reboot now", NULL);
+		system_cmd("reboot now\r\n", NULL);
 	}
 }
-static const unsigned short s_crc16_table[] = {
+static const uint16_t _crc16_table[] = {
 	0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 	0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
 	0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -162,26 +165,25 @@ static const unsigned short s_crc16_table[] = {
  * len:校验数据长度
  * return:校验码
  * */
-unsigned short m_calculate_crc16(unsigned short crc, unsigned char *ptr, unsigned int len)
+uint16_t calculate_crc16(uint16_t crc, uint8_t *ptr, uint32_t len)
 {
-	unsigned char temp;
+	uint8_t temp;
 
-    if(len <= 0 || NULL == ptr)
-    {
-        return false;
-    }
+    if(len <= 0 || NULL == ptr) { return false;   }
 	for( ; len--; ptr++)
 	{
 		temp = crc / 256;
-		crc <<= 8;								/* 左移8位 */
-		crc ^= s_crc16_table[temp ^ *ptr];			/* 高8位和当前字节相加后再查表求CRC ，再加上以前的CRC */
+        /* 左移8位 */
+		crc <<= 8;
+        /* 高8位和当前字节相加后再查表求CRC ，再加上以前的CRC */
+        crc ^= _crc16_table[temp ^ *ptr];	
 	}
 	return crc;
 }
 /* 多个字节转换成无符号整型数 */
-unsigned int s_byte_to_int(const unsigned char *byte, unsigned int len)
+uint32_t byte_to_int(const uint8_t *byte, uint32_t len)
 {
-	unsigned int tmp;
+	uint32_t tmp;
 
 	if(len > 4)
 	{
@@ -195,9 +197,9 @@ unsigned int s_byte_to_int(const unsigned char *byte, unsigned int len)
 }
 
 /* 多个字节转换成有符号整型数 */
-int s_byte_to_sint(const unsigned char *byte, unsigned int len)
+int32_t byte_to_sint(const uint8_t *byte, uint32_t len)
 {
-	unsigned int tmp;
+	uint32_t tmp;
 
 	if(len > 4)
 	{
@@ -210,13 +212,16 @@ int s_byte_to_sint(const unsigned char *byte, unsigned int len)
 	return tmp;
 }
 
-static const char HexAscii[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+static const char HexAscii[] = {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    'A', 'B', 'C', 'D', 'E', 'F'
+};
 
-unsigned int m_ascii_to_hex(unsigned char *hex, const char *ascii, unsigned int len)
+uint32_t ascii_to_hex(uint8_t *hex, const char *ascii, uint32_t len)
 {
-    unsigned int num;
-    unsigned int ch;
-    unsigned int flag;
+    uint32_t num;
+    uint32_t ch;
+    uint32_t flag;
 
     if(len == 0)
     {
@@ -271,12 +276,12 @@ unsigned int m_ascii_to_hex(unsigned char *hex, const char *ascii, unsigned int 
     return num / 2;
 }
 
-char *m_digit_to_ascii(char *ascii, const unsigned char *digit, unsigned int len)
+char *digit_to_ascii(char *ascii, const uint8_t *digit, uint32_t len)
 {
     for( ; len--; digit++)
     {
-            *ascii++ = HexAscii[*digit >> 4];
-            *ascii++ = HexAscii[*digit & 0x0F];
-        }
+        *ascii++ = HexAscii[*digit >> 4];
+        *ascii++ = HexAscii[*digit & 0x0F];
+    }
     return ascii;
 }

@@ -15,6 +15,7 @@
 #ifndef _NETWORK_DETECTION_H
 #define _NETWORK_DETECTION_H
 #include <json-c/json.h>
+#include <stdbool.h>
 
 #define DAEMON_SERVER_PORT      6000
 #define VER_CENTER_PORT         6001

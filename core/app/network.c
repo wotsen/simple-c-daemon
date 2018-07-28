@@ -36,10 +36,17 @@ struct json_object *pack_heart_beat(void)
     para = get_para_by_id(module->para_table, heart_id);
     heart = packet_json(module);
 
-    json_object_set_int(json_object_object_get(json_object_object_get(heart, "module"), "module-len"), 1);
-    json_object_set_int(json_object_object_get(json_object_object_get(heart, "module"), "module-cmd"), HEART_CMD);
+    json_object_set_int(
+            json_object_object_get(
+                json_object_object_get(heart, "module"), "module-len"),
+            1);
+    json_object_set_int(
+            json_object_object_get(
+                json_object_object_get(heart, "module"), "module-cmd"), 
+            HEART_CMD);
 
-    json_object_object_add(heart, "key-1", pack_json_para(para, (char *)"daemon heart beat"));
+    json_object_object_add(heart, "key-1", 
+            pack_json_para(para, (char *)"daemon heart beat"));
 
     pack_key_end(heart);
 

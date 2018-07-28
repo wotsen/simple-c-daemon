@@ -20,27 +20,21 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
-#include "../bool.h"
 #include "regexs.h"
 
 
 bool regex_match_string(const char *pattern, const char *data, char **match)
 {
-    if(NULL == pattern)
-    {
-        return false;
-    }
-    int i = 0;
-    int len;
+    if(!pattern) { return false; }
+    int32_t i = 0;
+    int32_t len;
 
     regex_t reg;
     regmatch_t pmatch[REGEXS_NM];
 
-    if(regcomp(&reg, pattern, REG_EXTENDED) < 0)
-    {   
-        return false; 
-    }
+    if(regcomp(&reg, pattern, REG_EXTENDED) < 0) { return false; }
     if(regexec(&reg, data, REGEXS_NM, pmatch, 0))
     {
         regfree(&reg);
@@ -61,21 +55,15 @@ bool regex_match_string(const char *pattern, const char *data, char **match)
 
 bool regex_match_file(const char *pattern, FILE *fd, char **match)
 {
-    if(NULL == pattern)
-    {
-        return false;
-    }
-    int i = 0;
-    int len, err;
+    if(!pattern) { return false; }
+    int32_t i = 0;
+    int32_t len, err;
     char buf[1024];
 
     regex_t reg;
     regmatch_t pmatch[REGEXS_NM];
 
-    if(regcomp(&reg, pattern, REG_EXTENDED) < 0)
-    {   
-        return false; 
-    }
+    if(regcomp(&reg, pattern, REG_EXTENDED) < 0) { return false; }
     for(memset(buf, 0, sizeof(buf)); NULL != fgets(buf, sizeof(buf), fd);)
     {
         err = regexec(&reg, buf, REGEXS_NM, pmatch, 0);

@@ -14,8 +14,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdbool.h>
 
-#include "../../module/bool.h"
 #include "zlog_config.h"
 #include "zlog_service.h"
 
@@ -36,10 +36,11 @@ static char dzlog_initial(const char *fmt_conf, const char *category)
     return true;
 }
 
-static void dzlog_out_stream(const char *log_path, const char *category, char lv, const char *fmt, va_list args)
+static void dzlog_out_stream(const char *log_path, const char *category,
+                             char lv, const char *fmt, va_list args)
 {
     pthread_mutex_lock(&zlog_lock);
-    if(dzlog_initial(log_path, category) == false){
+    if(!dzlog_initial(log_path, category)){
         pthread_mutex_unlock(&zlog_lock);
         return;
     }
@@ -69,28 +70,31 @@ static void dzlog_out_stream(const char *log_path, const char *category, char lv
     zlog_fini();
     pthread_mutex_unlock(&zlog_lock);
 }
-void s_system_log(char lv, const char *format, ...)
+void _system_log(char lv, const char *format, ...)
 {
 	va_list args;
 
 	va_start(args, format);
-    dzlog_out_stream((const char *)zlog_config_path, SYSTEM_LOG, lv, format, args);
+    dzlog_out_stream((const char *)zlog_config_path,
+                      SYSTEM_LOG, lv, format, args);
 	va_end(args);
 }
-void s_user_log(char lv, const char *format, ...)
+void _user_log(char lv, const char *format, ...)
 {
 	va_list args;
 
 	va_start(args, format);
-    dzlog_out_stream((const char *)zlog_config_path, USER_LOG, lv, format, args);
+    dzlog_out_stream((const char *)zlog_config_path,
+                      USER_LOG, lv, format, args);
 	va_end(args);
 }
-void s_dbg_log(char lv, const char *format, ...)
+void _dbg_log(char lv, const char *format, ...)
 {
 	va_list args;
 
 	va_start(args, format);
-    dzlog_out_stream((const char *)zlog_config_path, PROGRAM_DBG, lv, format, args);
+    dzlog_out_stream((const char *)zlog_config_path,
+                      PROGRAM_DBG, lv, format, args);
 	va_end(args);
 }
 /*

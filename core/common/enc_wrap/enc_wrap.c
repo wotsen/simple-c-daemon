@@ -16,27 +16,28 @@
  * =====================================================================================
  */
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "enc_wrap.h"
 
-unsigned char g_enc_key[9] = "yuan1314";
+uint8_t g_enc_key[9] = "yuan1314";
 
-unsigned char *enc_md5(const unsigned char *str, unsigned char *md)
+uint8_t *enc_md5(const uint8_t *str, uint8_t *md)
 {
     return md5(str, NULL, md);
 }
 
-unsigned char *enc_sha256(const unsigned char *str, unsigned char *md)
+uint8_t *enc_sha256(const uint8_t *str, uint8_t *md)
 {
     return sha256(str, NULL, md);
 }
 
-unsigned char *enc_des_en(const unsigned char *str, unsigned char *md)
+uint8_t *enc_des_en(const uint8_t *str, uint8_t *md)
 {
     return des_en(str, g_enc_key, md);
 }
 
-unsigned char *enc_des_de(const unsigned char *str, unsigned char *md)
+uint8_t *enc_des_de(const uint8_t *str, uint8_t *md)
 {
     return des_en(str, g_enc_key, md);
 }

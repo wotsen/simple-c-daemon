@@ -19,10 +19,11 @@
 #ifndef __PROTOCOL_H__
 #define __PROTOCOL_H__
 
+#include <inttypes.h>
+#include <stdbool.h>
 #include <json-c/json.h>
 
 #include "../module/def.h"
-#include "../module/bool.h"
 #include "../module//tools/tools.h"
 
 
@@ -38,25 +39,27 @@
 
 typedef struct {
     const char *name;
-    const unsigned short id;
+    const uint16_t id;
 }PACKED class_para_head;
 
 typedef struct {
-#define PARA_END    {{NULL, 0xFFFF}, 0, 0xf, 0xFF, NULL, NULL, NULL, NULL, NULL, 0xFFFF, 0, 0, 0}
+#define PARA_END    {{NULL, 0xFFFF}, 0, 0xf, 0xFF, NULL, \
+                     NULL, NULL, NULL, NULL, 0xFFFF, 0, 0, 0}
    class_para_head id; 
-   const unsigned int len;
+   const uint32_t len;
    const char type;
-   const unsigned char permission;
+   const uint8_t permission;
    const char *init_val;
    void *address;
    char *(*getset)(void);
    char *(*check)(void);
    char (*valid)(void);
-   unsigned short section;
-   int para1;
-   int para2;
-   int para3;
+   uint16_t section;
+   int32_t para1;
+   int32_t para2;
+   int32_t para3;
 }PACKED class_para;
+
 class_para *get_para_by_id(class_para *para_tables, class_para_head id);
 struct json_object *pack_json_para(class_para *para, char *val);
 struct json_object *pack_key_end(struct json_object *packet);
@@ -65,12 +68,12 @@ struct json_object *pack_key_end(struct json_object *packet);
 typedef struct {
 #define MODULE_END  {NULL, 0xFF, NULL, NULL, NULL}
     const char *section;
-    const unsigned char id;
+    const uint8_t id;
     class_para *para_table;
     char *(*exec)(void);
     void (*def_function)(void);
 }PACKED class_module;
-class_module *get_module_by_id(unsigned char id);
+class_module *get_module_by_id(uint8_t id);
 
 struct os_base_info {
     const char *key;
@@ -79,7 +82,10 @@ struct os_base_info {
 
 struct json_object *packet_json(class_module *module);
 bool unpack_json_head(struct json_object *packet);
-bool unpack_json_module(struct json_object *packet, struct json_object *module);
-bool unpack_json_key(struct json_object *packet, struct json_object *module, struct json_object *key);
+bool unpack_json_module(struct json_object *packet, 
+                        struct json_object *module);
+bool unpack_json_key(struct json_object *packet,
+                     struct json_object *module,
+                     struct json_object *key);
 
 #endif

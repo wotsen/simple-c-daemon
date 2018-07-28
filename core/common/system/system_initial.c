@@ -24,7 +24,7 @@
 
 static struct utsname os_info;
 
-struct utsname __uname(void)
+static struct utsname _uname(void)
 {
     memset(&os_info, 0, sizeof(struct utsname));
     uname(&os_info);
@@ -63,7 +63,7 @@ void config_initial(void)
 
 void system_initial(void)
 {
-    __uname();
+    _uname();
     config_initial();
     para_initial();
     network_initial();

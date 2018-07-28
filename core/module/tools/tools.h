@@ -27,17 +27,17 @@
 
 
 
-unsigned char m_system_cmd(const char *cmd, const char *args);
-void m_system_reboot(void);
-void *m_memory_alloc(unsigned int size);
-void *m_memory_realloc(unsigned int now_size, void *old, void *addr, unsigned int len);
-unsigned short m_calculate_crc16(unsigned short crc, unsigned char *ptr, unsigned int len);
+unsigned char system_cmd(const char *cmd, const char *args);
+void system_reboot(void);
+void *memory_alloc(unsigned int size);
+void *memory_realloc(unsigned int now_size, void *old, void *addr, unsigned int len);
+unsigned short calculate_crc16(unsigned short crc, unsigned char *ptr, unsigned int len);
 /* 多个字节转换成无符号整型数 */
-unsigned int s_byte_to_int(const unsigned char *byte, unsigned int len);
+unsigned int byte_to_int(const unsigned char *byte, unsigned int len);
 /* 多个字节转换成有符号整型数 */
-int s_byte_to_sint(const unsigned char *byte, unsigned int len);
-char *m_digit_to_ascii(char *ascii, const unsigned char *digit, unsigned int len);
-unsigned int m_ascii_to_hex(unsigned char *hex, const char *ascii, unsigned int len);
+int byte_to_sint(const unsigned char *byte, unsigned int len);
+char *digit_to_ascii(char *ascii, const unsigned char *digit, unsigned int len);
+unsigned int ascii_to_hex(unsigned char *hex, const char *ascii, unsigned int len);
 
 #define MAX_INT8    128
 #define MAX_UINT8   (MAX_INT8 * 2 -1)
@@ -48,9 +48,9 @@ unsigned int m_ascii_to_hex(unsigned char *hex, const char *ascii, unsigned int 
 #define MAX_INT64   9223372036854775808l
 #define MAX_UINT64  18446744073709551615ul
 
-#define m_byte_to_word(byte)	s_byte_to_int(byte, 2)	/* 两个字节的数组转换成整型数 */
-#define m_byte_to_int24(byte)	s_byte_to_int(byte, 3)	/* 三个字节的数组转换成整型数 */
-#define m_byte_to_long(byte)	s_byte_to_int(byte, 4)	/* 四个字节的数组转换成整型数 */
+#define byte_to_word(byte)	byte_to_int(byte, 2)	/* 两个字节的数组转换成整型数 */
+#define byte_to_int24(byte)	byte_to_int(byte, 3)	/* 三个字节的数组转换成整型数 */
+#define byte_to_long(byte)	byte_to_int(byte, 4)	/* 四个字节的数组转换成整型数 */
 
 #endif
 

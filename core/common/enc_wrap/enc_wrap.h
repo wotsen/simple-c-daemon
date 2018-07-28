@@ -18,11 +18,12 @@
 #ifndef __ENC_WRAP_H__
 #define __ENC_WRAP_H__
 
+#include <inttypes.h>
 #include "../../module/encryption/encryption.h"
 
-unsigned char *enc_md5(const unsigned char *str, unsigned char *md);
-unsigned char *enc_sha256(const unsigned char *str, unsigned char *md);
-unsigned char *enc_des_en(const unsigned char *str, unsigned char *md);
-unsigned char *enc_des_de(const unsigned char *str, unsigned char *md);
+uint8_t *enc_md5(const uint8_t *str, uint8_t *md);
+uint8_t *enc_sha256(const uint8_t *str, uint8_t *md);
+uint8_t *enc_des_en(const uint8_t *str, uint8_t *md);
+uint8_t *enc_des_de(const uint8_t *str, uint8_t *md);
 
 #endif

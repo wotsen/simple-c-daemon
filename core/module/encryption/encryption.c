@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <openssl/md5.h>
 #include <openssl/sha.h>
@@ -21,19 +22,28 @@
 
 #include "encryption.h"
 
-typedef unsigned char *(*encrypt_fun)(const unsigned char *, size_t len, unsigned char *);
-typedef unsigned char *(*abstract_fun)(unsigned char, const unsigned char *, unsigned char *, unsigned char *);
+typedef uint8_t *(*encrypt_fun)(
+                        const uint8_t *, 
+                        size_t len, uint8_t *);
+typedef uint8_t *(*abstract_fun)(
+                        uint8_t, const uint8_t *, 
+                        uint8_t *, uint8_t *);
 
-static unsigned char *md5_sha256_abstract(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                        unsigned char *md)
+static uint8_t *_md5__sha256_abstract(
+                        uint8_t encrypt_type, 
+                        const uint8_t *dest_str, 
+                        uint8_t *md)
 {
 
 	encrypt_fun encrypt;
-	unsigned char tmp_md[64] = {0};
+
+    if(!dest_str || !md) { return NULL; }
+
+	uint8_t len = strlen((char *)dest_str);
+	int i = 0;
+	uint8_t tmp_md[64] = {0};
 	char dest_key[128] = {0};
 	char char_tmp[3] = {0};
-	int i = 0;
-	unsigned char len = strlen((char *)dest_str);
 
 	switch(encrypt_type)
 	{
@@ -46,10 +56,7 @@ static unsigned char *md5_sha256_abstract(unsigned char encrypt_type, const unsi
 		default:
 			return NULL;
 	}
-	if(NULL == encrypt(dest_str, len, tmp_md))
-	{
-		return NULL;
-	}
+	if(!encrypt(dest_str, len, tmp_md)) { return NULL; }
 	for(i = 0; i < 32; i++)
 	{
 		sprintf(char_tmp, "%02x", tmp_md[i]);
@@ -61,30 +68,32 @@ static unsigned char *md5_sha256_abstract(unsigned char encrypt_type, const unsi
 }
 
 
-static unsigned char *md5_abstract(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *key, unsigned char *md5)
+static uint8_t *_md5_abstract(uint8_t encrypt_type, 
+                              const uint8_t *dest_str, 
+                              uint8_t *key, uint8_t *md5)
 {
-	return md5_sha256_abstract(encrypt_type, dest_str, md5);
+	return _md5__sha256_abstract(encrypt_type, dest_str, md5);
 }
 
-static unsigned char *sha256_abstract(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *key, unsigned char *sha256)
+static uint8_t *_sha256_abstract(uint8_t encrypt_type,
+                                 const uint8_t *dest_str, 
+                                 uint8_t *key, uint8_t *sha256)
 {
-	return md5_sha256_abstract(encrypt_type, dest_str, sha256);
+	return _md5__sha256_abstract(encrypt_type, dest_str, sha256);
 }
 
 
 #define DES_KEY_LEN	8
 
-static unsigned char *__des_en_de__(int mode, const unsigned char *dest_str, 
-                                    unsigned char *key, unsigned char *md)
+static uint8_t *__des_en_de__(int mode, const uint8_t *dest_str, 
+                              uint8_t *key, uint8_t *md)
 {
-	unsigned char vec_cipher_text[512] = {0};
-	unsigned char tmp[DES_KEY_LEN] = {0};
+	uint8_t vec_cipher_text[512] = {0};
+	uint8_t tmp[DES_KEY_LEN] = {0};
 	
 	int i = 0;
-    unsigned char dest_len = strlen((char *)dest_str);
-    unsigned char key_len = strlen((char *)key);
+    uint8_t dest_len = strlen((char *)dest_str);
+    uint8_t key_len = strlen((char *)key);
 
 	DES_cblock key_encrypt;
 
@@ -131,46 +140,49 @@ static unsigned char *__des_en_de__(int mode, const unsigned char *dest_str,
 
 	return md;
 }
-static unsigned char *__des_encrypt(const unsigned char *dest_str,
-                                    unsigned char *key, unsigned char *md)
+static uint8_t *__des_encrypt(const uint8_t *dest_str,
+                                    uint8_t *key, uint8_t *md)
 {
 	return __des_en_de__(DES_ENCRYPT, dest_str, key, md);
 }
-static unsigned char *__des_decrypt(const unsigned char *dest_str,
-                                    unsigned char *key, unsigned char *md)
+static uint8_t *__des_decrypt(const uint8_t *dest_str,
+                                    uint8_t *key, uint8_t *md)
 {
 	return __des_en_de__(DES_DECRYPT, dest_str, key, md);
 }
 
-static unsigned char *des_encrypt(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *key, unsigned char *md)
+static uint8_t *_des_encrypt(uint8_t encrypt_type, 
+                                     const uint8_t *dest_str, 
+                                     uint8_t *key, uint8_t *md)
 {
 	return __des_encrypt(dest_str, key, md);
 }
-static unsigned char *des_decrypt(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *key,unsigned char *md)
+static uint8_t *_des_decrypt(uint8_t encrypt_type, 
+                                     const uint8_t *dest_str, 
+                                     uint8_t *key,uint8_t *md)
 {
 	return __des_decrypt(dest_str, key, md);
 }
 
-unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest_str, 
-                                    unsigned char *key, unsigned char *md)
+uint8_t *openssl_lib(uint8_t encrypt_type, 
+                     const uint8_t *dest_str, 
+                     uint8_t *key, uint8_t *md)
 {
 	abstract_fun abstract;
 
 	switch(encrypt_type)
 	{
 		case MD5_TYPE:
-			abstract = md5_abstract;
+			abstract = _md5_abstract;
 			break;
 		case SHA256_TYPE:
-			abstract = sha256_abstract;
+			abstract = _sha256_abstract;
 			break;
 		case DES_EN_TYPE:
-			abstract = des_encrypt;
+			abstract = _des_encrypt;
 			break;
 		case DES_DE_TYPE:
-			abstract = des_decrypt;
+			abstract = _des_decrypt;
 			break;
 		default:
 			return NULL;
@@ -183,9 +195,9 @@ unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest
 #if 0
 int main()
 {
-	unsigned char md[33] = {0};
-	unsigned char md2[33] = {0};
-	const unsigned char *pass = "password_key";
+	uint8_t md[33] = {0};
+	uint8_t md2[33] = {0};
+	const uint8_t *pass = "password_key";
 
 	md5(pass, md);
 

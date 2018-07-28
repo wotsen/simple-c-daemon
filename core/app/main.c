@@ -18,9 +18,7 @@
 #include "../module/module.h"
 #include "../common/common.h"
 
-#define DAEMON_TEST 1
-
-#if DAEMON_TEST
+#ifdef DAEMON_TEST
 
 #define DIR_MODE   1
 #define STD_MODE   0
@@ -43,7 +41,9 @@ void create_daemon(void)
 
 int main(int args, char **argv)
 {
-    //create_daemon();
+#ifdef DAEMON
+    create_daemon();
+#endif
     printf("%d %s\n", args, argv[0]);
     system_start();
     return 0;

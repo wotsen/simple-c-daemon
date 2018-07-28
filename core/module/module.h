@@ -15,7 +15,6 @@
 #ifndef _MODULE_H
 #define _MODULE_H
 
-#include "bool.h"
 #include "def.h"
 #include "tools/tools.h"
 #include "net/net.h"

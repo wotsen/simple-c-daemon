@@ -20,25 +20,26 @@
 #include <limits.h>
 #include <errno.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "../../module/def.h"
 #include "file_ops.h"
 #include "def_files.h"
 #include "../zlog_service/zlog_service.h"
 
-dictionary *__ini_parse(const char *ini_name)
+dictionary *ini_parse(const char *ini_name)
 {
     FILE *ini = NULL;
     dictionary *dict = NULL;
 
-    if(NULL == (ini = fopen(ini_name, "r")))
+    if(!(ini = fopen(ini_name, "r")))
     {
         dbg_error("can not open : [%s]", ini_name);
         return NULL;
     }
     fclose(ini);
 
-    if(NULL == (dict = iniparser_load(ini_name)))
+    if(!(dict = iniparser_load(ini_name)))
     {
         dbg_error("can not iniparser_load : [%s]", ini_name);
     }
@@ -56,7 +57,8 @@ bool check_section(dictionary *dict, const char *section)
     return iniparser_find_entry(dict, section) ? true : false;
 }
 
-bool initial_key_value(dictionary *dict, const char *section, const char *key, char *val)
+bool initial_key_value(dictionary *dict, const char *section, 
+                       const char *key, char *val)
 {
     char section_key[256];
     sprintf(section_key, "%s:%s", section, key);
@@ -66,15 +68,17 @@ bool initial_key_value(dictionary *dict, const char *section, const char *key, c
         dbg_error("set [%s] error", section_key);
         return false;
     }
+
     return true;
 }
 
-bool set_key_value(dictionary *dict, const char *section, const char *key,  const char type, char *val)
+bool set_key_value(dictionary *dict, const char *section,
+                   const char *key,  const char type, char *val)
 {
     char section_key[256];
     char s_val[256];
-    short s_tmp = 0;
-    int i_tmp = 0;
+    int16_t s_tmp = 0;
+    int32_t i_tmp = 0;
     long l_tmp = 0;
     long long ll_tmp = 0;
     double d_tmp = 0.0;
@@ -88,7 +92,7 @@ bool set_key_value(dictionary *dict, const char *section, const char *key,  cons
             sprintf(s_val, "%d", *val);
             break;
         case __uchar:
-            sprintf(s_val, "%d", (unsigned char)*val);
+            sprintf(s_val, "%d", (uint8_t)*val);
             break;
         case __short:
             memcpy(&s_tmp, val, sizeof(s_tmp));
@@ -96,7 +100,7 @@ bool set_key_value(dictionary *dict, const char *section, const char *key,  cons
             break;
         case __ushort:
             memcpy(&s_tmp, val, sizeof(s_tmp));
-            sprintf(s_val, "%d", (unsigned short)s_tmp);
+            sprintf(s_val, "%d", (uint16_t)s_tmp);
             break;
         case __int:
             memcpy(&i_tmp, val, sizeof(i_tmp));
@@ -104,7 +108,7 @@ bool set_key_value(dictionary *dict, const char *section, const char *key,  cons
             break;
         case __uint:
             memcpy(&i_tmp, val, sizeof(i_tmp));
-            sprintf(s_val, "%u", (unsigned int)i_tmp);
+            sprintf(s_val, "%u", (uint32_t)i_tmp);
             break;
         case __long:
             memcpy(&l_tmp, val, sizeof(l_tmp));
@@ -139,6 +143,7 @@ bool set_key_value(dictionary *dict, const char *section, const char *key,  cons
         dbg_error("set [%s] error", section_key);
         return false;
     }
+
     return true;
 }
 
@@ -149,6 +154,7 @@ bool check_strtoll(long long val)
         dbg_error("trans error");
         return false;
     }
+
     return true;
 }
 bool check_strtod(double val)
@@ -158,12 +164,13 @@ bool check_strtod(double val)
         dbg_error("trans error");
         return false;
     }
+
     return true;
 }
 
 
 
-bool strto_type_val(const char *s, char *val, const char type, int len)
+bool strto_type_val(const char *s, char *val, const char type, int32_t len)
 {
     long long ll_tmp = 0;
     double d_tmp = 0.0;
@@ -183,35 +190,35 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((unsigned char *)val, (unsigned char *)&ll_tmp, sizeof(unsigned char));
+                memcpy((uint8_t *)val, (uint8_t *)&ll_tmp, sizeof(uint8_t));
             }
             break;
         case __short:
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((short *)val, (short *)&ll_tmp, sizeof(short));
+                memcpy((int16_t *)val, (int16_t *)&ll_tmp, sizeof(int16_t));
             }
             break;
         case __ushort:
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((unsigned short *)val, (unsigned short *)&ll_tmp, sizeof(unsigned short));
+                memcpy((uint16_t *)val, (uint16_t *)&ll_tmp, sizeof(uint16_t));
             }
             break;
         case __int:
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((int *)val, (int *)&ll_tmp, sizeof(int));
+                memcpy((int32_t *)val, (int32_t *)&ll_tmp, sizeof(int32_t));
             }
             break;
         case __uint:
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((unsigned int *)val, (unsigned int *)&ll_tmp, sizeof(unsigned int));
+                memcpy((uint32_t *)val, (uint32_t *)&ll_tmp, sizeof(uint32_t));
             }
             break;
         case __long:
@@ -225,7 +232,9 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((unsigned long *)val, (unsigned long *)&ll_tmp, sizeof(unsigned long));
+                memcpy((unsigned long *)val, 
+                       (unsigned long *)&ll_tmp, 
+                        sizeof(unsigned long));
             }
             break;
         case __llong:
@@ -239,7 +248,9 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
             ll_tmp = strtoll(s, NULL, 0);
             if(check_strtoll(ll_tmp))
             {
-                memcpy((unsigned long long *)val, (unsigned long long *)&ll_tmp, sizeof(unsigned long long));
+                memcpy((unsigned long long *)val,
+                       (unsigned long long *)&ll_tmp, 
+                       sizeof(unsigned long long));
             }
             break;
         case __double:
@@ -258,34 +269,38 @@ bool strto_type_val(const char *s, char *val, const char type, int len)
         default:
             return false;
     }
+
     return true;
 }
-#undef dbg
 
 
-bool get_key_value(dictionary *dict, const char *section, const char *key,  const char type, char *val, int len)
+bool get_key_value(dictionary *dict, const char *section, 
+                   const char *key,  const char type, 
+                   char *val, int32_t len)
 {
     char *s = NULL;
     char section_key[256];
     sprintf(section_key, "%s:%s", section, key);
 
-    if(NULL == (s = (char *)iniparser_getstring(dict, section_key, NULL)))
+    if(!(s = (char *)iniparser_getstring(dict, section_key, NULL)))
     {
         dbg_error("get [%s] error", section_key);
         return false;
     }
+
     return strto_type_val((const char *)s, val, type, len);
 }
-bool __ini_save(const char *ini_name, dictionary *dict)
+bool ini_save(const char *ini_name, dictionary *dict)
 {
     FILE *ini = NULL;
-    if(NULL == (ini = fopen(ini_name, "w+")))
+    if(!(ini = fopen(ini_name, "w+")))
     {
         dbg_error("can not save : [%s]", ini_name);
         return false;
     }
     iniparser_dump_ini(dict, ini);
     fclose(ini);
+
     return true;
 }
 
@@ -301,21 +316,24 @@ static const char *dir_path_table[] = {
 
 void create_dir(void)
 {
-    int i = 0;
+    int32_t i = 0;
     char cmd[256];
+
     for(i = 0; NULL != dir_path_table[i]; i++)
     {
         sprintf(cmd, "mkdir %s -p", dir_path_table[i]);
     }
 }
 
-FILE *__open_file(const char *path)
+FILE *open_file(const char *path)
 {
     FILE *fd;
-    if(NULL == (fd = fopen(path, "r+")))
+
+    if(!(fd = fopen(path, "r+")))
     {
         fd = fopen(path, "w+");
     }
+
     return fd;
 }
 
