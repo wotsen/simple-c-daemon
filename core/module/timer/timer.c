@@ -58,11 +58,9 @@ void ostime_delay(uint32_t tick)
  */
 struct tm *getostime_format(struct tm *tm)
 {
-	if(tm == NULL)
-		return NULL;
+	if (!tm) { return NULL; }
 	time_t sec;
-	if((sec = time(NULL)) < 0)
-	{
+	if ((sec = time(NULL)) < 0) {
 		return NULL;
 	}
 	tm = localtime(&sec);
@@ -71,10 +69,7 @@ struct tm *getostime_format(struct tm *tm)
 
 static char *s_time_strformat(struct tm *tm, char *str)
 {
-    if((NULL == tm) || (NULL == str))
-    {
-        return NULL;
-    }
+    if (!tm || !str) { return NULL; }
 #if LANGUAGE_ZH
 	sprintf((char *)str, "%d年 %d月 %d日 %s %d:%d:%d", \
 			tm->tm_year + 1900, \
@@ -103,8 +98,7 @@ static char *s_time_strformat(struct tm *tm, char *str)
  */
 char *getostimestr(char *str)
 {
-	if(str == NULL)
-		return NULL;
+	if (!str) { return NULL; }
 	struct tm tm;
     return s_time_strformat(getostime_format(&tm), str);
 }

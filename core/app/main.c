@@ -32,8 +32,7 @@
 
 void create_daemon(void)
 {
-    if(-1 == daemon(DIR_MODE, STD_MODE))
-    {
+    if (-1 == daemon(DIR_MODE, STD_MODE)) {
         system_info("daemon initial ending:error");
         exit(0);
     }

@@ -37,14 +37,13 @@ bool core_password_veri(char secu_lv, const char *user,
     char sql[1024];
     uint8_t md[40];
 
-    if(!user || !password) { return false; }
-    switch(secu_lv)
-    {
+    if (!user || !password) { return false; }
+    switch (secu_lv) {
         case DATABASE_LOW:
             sprintf((char *)md, "%s", password);
             break;
         case DATABASE_SHA256:
-            if(!enc_sha256((const uint8_t *)password, md)) {
+            if (!enc_sha256((const uint8_t *)password, md)) {
                 return false;
             }
             break;
@@ -54,13 +53,11 @@ bool core_password_veri(char secu_lv, const char *user,
     sprintf(sql, 
             "select user, password from %s where user='%s' and password='%s';",
             CORE_USER_VERI_DB_NAME, user, md);
-    if(sqlite3_open(USER_PASSWOR_DB_PATH, &db) < 0)
-    {
+    if (sqlite3_open(USER_PASSWOR_DB_PATH, &db) < 0) {
         system_log(LV_ERROR, "can not open %s\r\n", USER_PASSWOR_DB_PATH);
         return false;
     }
-    if(sqlite3_exec(db, sql, callback_veri, NULL, NULL) != SQLITE_OK)
-    {
+    if (sqlite3_exec(db, sql, callback_veri, NULL, NULL) != SQLITE_OK) {
         sqlite3_close(db);
         dbg_error("%s :error\r\n", sql);
         return false;

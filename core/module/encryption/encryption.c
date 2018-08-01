@@ -37,7 +37,7 @@ static uint8_t *_md5__sha256_abstract(
 
 	encrypt_fun encrypt;
 
-    if(!dest_str || !md) { return NULL; }
+    if (!dest_str || !md) { return NULL; }
 
 	uint8_t len = strlen((char *)dest_str);
 	int i = 0;
@@ -45,8 +45,7 @@ static uint8_t *_md5__sha256_abstract(
 	char dest_key[128] = {0};
 	char char_tmp[3] = {0};
 
-	switch(encrypt_type)
-	{
+	switch (encrypt_type) {
 		case MD5_TYPE:
 			encrypt = MD5;
 			break;
@@ -56,9 +55,8 @@ static uint8_t *_md5__sha256_abstract(
 		default:
 			return NULL;
 	}
-	if(!encrypt(dest_str, len, tmp_md)) { return NULL; }
-	for(i = 0; i < 32; i++)
-	{
+	if (!encrypt(dest_str, len, tmp_md)) { return NULL; }
+	for (i = 0; i < 32; i++) {
 		sprintf(char_tmp, "%02x", tmp_md[i]);
 		strcat(dest_key, char_tmp);
 	}
@@ -99,12 +97,9 @@ static uint8_t *__des_en_de__(int mode, const uint8_t *dest_str,
 
 	/* 构造8位长度的密钥 */
 	memset(key_encrypt, 0, DES_KEY_LEN);
-	if(key_len <= DES_KEY_LEN)
-	{
+	if (key_len <= DES_KEY_LEN) {
 		memcpy(key_encrypt, key, key_len);
-	}
-	else
-	{
+	} else {
 		memcpy(key_encrypt, key, DES_KEY_LEN);
 	}
 	/* 密钥置换 */
@@ -114,8 +109,7 @@ static uint8_t *__des_en_de__(int mode, const uint8_t *dest_str,
 	const_DES_cblock input_text;
 	DES_cblock output_text;
 
-	for(i = 0; i < dest_len / DES_KEY_LEN; i++)
-	{
+	for (i = 0; i < dest_len / DES_KEY_LEN; i++) {
 		memcpy(input_text, dest_str+i*DES_KEY_LEN, DES_KEY_LEN);
 		DES_ecb_encrypt(&input_text, &output_text, &key_schedule, mode);
 		memcpy(tmp, output_text, DES_KEY_LEN);
@@ -123,8 +117,7 @@ static uint8_t *__des_en_de__(int mode, const uint8_t *dest_str,
 		memcpy(vec_cipher_text+i*DES_KEY_LEN, tmp, DES_KEY_LEN);
 	}
 
-	if(dest_len % DES_KEY_LEN != 0)
-	{
+	if (dest_len % DES_KEY_LEN != 0) {
 		int tmp1 = dest_len / DES_KEY_LEN * DES_KEY_LEN;
 		int tmp2 = dest_len - tmp1;
 		memset(input_text, 0, DES_KEY_LEN);
@@ -170,8 +163,7 @@ uint8_t *openssl_lib(uint8_t encrypt_type,
 {
 	abstract_fun abstract;
 
-	switch(encrypt_type)
-	{
+	switch (encrypt_type) {
 		case MD5_TYPE:
 			abstract = _md5_abstract;
 			break;

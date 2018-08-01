@@ -26,7 +26,14 @@
 
 #define NET_DATA_LEN_MAX        1024
 
-bool put_udp_task(struct json_object *(*fun)(void));
+typedef struct {
+    struct json_object *udp_data;
+    struct list_head list;
+}class_udp_recv_list;
+
+typedef struct json_object *(*udp_task_function)(void);
+
+bool put_udp_task(udp_task_function fun);
 void udp_net_initial(void);
 void network_start(void);
 

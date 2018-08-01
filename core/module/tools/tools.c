@@ -7,14 +7,11 @@
  *********************************    ***************************************/
 
 #include <stdio.h>
-#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <ctype.h>
-#include <stdbool.h>
-
 #include <linux/types.h>
 
 #include "tools.h"
@@ -28,11 +25,13 @@ void *memory_alloc(uint32_t size)
 {
 	void *addr;
     int32_t memcount = 200*1000;    /* 1秒钟申请不到返回 */
-	while((addr = malloc(size)) == NULL)
-	{
-        if(!memcount)
-            break;
+	while (!(addr = malloc(size))) {
+        if(!memcount) { break; }
+#ifdef LANGUAGE_ZH
 		printf("申请不到内存\r\n");
+#else
+        printf("Cannot apply for memory\r\n");
+#endif
         usleep(500*1000);
         memcount--;
 	}
@@ -50,10 +49,8 @@ return:新内存首地址
 void *memory_realloc(uint32_t new_size, void *old, void *addr, uint32_t len)
 {
 	void *new_ptr;
-	if(NULL == (new_ptr = memory_alloc(new_size)))
-        return new_ptr;
-	if(len)
-	{
+	if (!(new_ptr = memory_alloc(new_size))) { return new_ptr; }
+	if (len) {
 		memcpy(new_ptr, addr, (new_size < len) ? new_size : len);
 	}
 	free(old);
@@ -66,48 +63,56 @@ cmd:命令名称
 args:命令参数
 return:执行结果返回
  */
-uint8_t  system_cmd(const char *cmd, const char *args)
+bool  system_cmd(const char *cmd, const char *args)
 {
-	if(!cmd) { return false; }
+	if (!cmd) { return false; }
 	pid_t status;
 	char cmd_or_output[255];
 	memset(cmd_or_output, 0, sizeof(cmd_or_output));
-	if(args){
+	if (args) {
 		sprintf(cmd_or_output, "%s %s", cmd, args);
-    }else{
+    } else {
 		sprintf(cmd_or_output, "%s", cmd);
     }
 	memset(cmd_or_output, 0, sizeof(cmd_or_output));
-	if((status = system(cmd_or_output)) == -1)
-	{
+	if ((status = system(cmd_or_output)) == -1) {
 		sprintf(cmd_or_output, "system:%s\r\n", strerror(errno));
 #if dbg
 		printf("%s", cmd_or_output);
 #endif
-	}
-	else
-	{
-		if(WIFEXITED(status))
-		{
-			if(!WEXITSTATUS(status))
-			{
+	} else {
+		if (WIFEXITED(status)) {
+			if (!WEXITSTATUS(status)) {
+#ifdef LANGUAGE_ZH
 				sprintf(cmd_or_output, "脚本执行成功[%d,%d,0x%X]\r\n",
                         errno, WEXITSTATUS(status), status);
+#else
+				sprintf(cmd_or_output, "Script execution succeeded[%d,%d,0x%X]\r\n",
+                        errno, WEXITSTATUS(status), status);
+#endif
 #if dbg
 				printf("%s", cmd_or_output);
 #endif
 				return true;
 			}
+#ifdef LANGUAGE_ZH
 			sprintf(cmd_or_output, "脚本执行失败[%d,%d,0x%X]\r\n",
                     errno, WEXITSTATUS(status), status);
+#else
+			sprintf(cmd_or_output, "Script execution failed[%d,%d,0x%X]\r\n",
+                    errno, WEXITSTATUS(status), status);
+#endif
 #if dbg
 			printf("%s", cmd_or_output);
 #endif
-		}
-		else
-		{
+		} else {
+#ifdef LANGUAGE_ZH
 			sprintf(cmd_or_output, "错误退出[%d,%d,0x%X]\r\n",
                     errno, WEXITSTATUS(status), status);
+#else
+			sprintf(cmd_or_output, "Error exit[%d,%d,0x%X]\r\n",
+                    errno, WEXITSTATUS(status), status);
+#endif
 #if dbg
 			printf("%s", cmd_or_output);
 #endif
@@ -119,8 +124,7 @@ uint8_t  system_cmd(const char *cmd, const char *args)
 /*系统重启*/
 void system_reboot(void)
 {
-	while(1)
-	{
+	while (1) {
         sleep(2);
 		system_cmd("reboot now\r\n", NULL);
 	}
@@ -169,9 +173,8 @@ uint16_t calculate_crc16(uint16_t crc, uint8_t *ptr, uint32_t len)
 {
 	uint8_t temp;
 
-    if(len <= 0 || NULL == ptr) { return false;   }
-	for( ; len--; ptr++)
-	{
+    if (len <= 0 || NULL == ptr) { return false; }
+	for ( ; len--; ptr++) {
 		temp = crc / 256;
         /* 左移8位 */
 		crc <<= 8;
@@ -185,12 +188,8 @@ uint32_t byte_to_int(const uint8_t *byte, uint32_t len)
 {
 	uint32_t tmp;
 
-	if(len > 4)
-	{
-		len = 4;
-	}
-	for(tmp = 0 ; len--; )
-	{
+	if (len > 4) { len = 4; }
+	for (tmp = 0 ; len--; ) {
 		tmp = (tmp << 8) + *(byte + len);
 	}
 	return tmp;
@@ -201,12 +200,8 @@ int32_t byte_to_sint(const uint8_t *byte, uint32_t len)
 {
 	uint32_t tmp;
 
-	if(len > 4)
-	{
-		len = 4;
-	}
-	for(tmp = 0 ; len--; )
-	{
+	if (len > 4) { len = 4; }
+	for (tmp = 0 ; len--; ) {
 		tmp = (tmp << 8) + *(byte + len);
 	}
 	return tmp;
@@ -223,53 +218,36 @@ uint32_t ascii_to_hex(uint8_t *hex, const char *ascii, uint32_t len)
     uint32_t ch;
     uint32_t flag;
 
-    if(len == 0)
-    {
-        while(isxdigit(*(ascii + len)))
-        {
+    if (len == 0) {
+        while (isxdigit(*(ascii + len))) {
             len++;
         }
     }
-    if((num = len & 0x01) == 1)
-    {
+    if ((num = len & 0x01) == 1) {
         len++;
         flag = true;
-    }
-    else
-    {
+    } else {
         flag = false;
     }
-    for(; num < len; num++)
-    {
+    for ( ; num < len; num++) {
         ch = *ascii++;
-        if((ch >= '0') && (ch <= '9'))
-        {
+        if ((ch >= '0') && (ch <= '9')) {
             ch -= '0';
-        }
-        else if((ch >= 'A') && (ch <= 'F'))
-        {
+        } else if ((ch >= 'A') && (ch <= 'F')) {
             ch -= 'A' - 0x0A;
-        }
-        else if((ch >= 'a') && (ch <= 'f'))
-        {
+        } else if ((ch >= 'a') && (ch <= 'f')) {
             ch -= 'a' - 0x0A;
-        }
-        else
-        {
+        } else {
             break;      // 遇到非法字符,转换提前结束
         }
-        if(num & 0x01)
-        {
-            if(flag)
-            {
+        if (num & 0x01) {
+            if (flag) {
                 flag = false;
                 *hex = 0;
             }
             *hex |= ch;         //低半字节
             hex++;
-        }
-        else
-        {
+        } else {
             *hex = ch << 4;     //高半字节
         }
     }
@@ -278,8 +256,7 @@ uint32_t ascii_to_hex(uint8_t *hex, const char *ascii, uint32_t len)
 
 char *digit_to_ascii(char *ascii, const uint8_t *digit, uint32_t len)
 {
-    for( ; len--; digit++)
-    {
+    for ( ; len--; digit++) {
         *ascii++ = HexAscii[*digit >> 4];
         *ascii++ = HexAscii[*digit & 0x0F];
     }

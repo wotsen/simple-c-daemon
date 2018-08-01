@@ -30,7 +30,7 @@ dictionary *ini_parse(const char *ini_name);
 bool create_section(dictionary *dict, const char *section);
 bool check_section(dictionary *dict, const char *section);
 bool initial_key_value(dictionary *dict, const char *section, const char *key, char *val);
-bool set_key_value(dictionary *dict, const char *section, const char *key, const char type, char *val);
+bool set_key_value(dictionary *dict, const char *section, const char *key, const char type, char *val, int32_t len);
 bool get_key_value(dictionary *dict, const char *section, const char *key, const char type, char *val, int32_t len);
 bool ini_save(const char *ini_name, dictionary *dict);
 

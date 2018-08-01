@@ -22,10 +22,9 @@ extern void system_initial(void);
 void system_start(void)
 {
     system_initial();
-    system_info("..............system start....................");
+    system_info("\n..............system start....................");
     network_start();
-    while(1)
-    {
+    while (1) {
         ostime_delay(OS_SEC(10));
     }
 }

@@ -5,7 +5,7 @@ LIB = -ldl -lm -lzlog -lpthread -lssl -lcrypto -lsqlite3 -ljson-c
 
 BUILDLIBS =
 
-CFLAG = -Wall 
+CFLAG = -Wall -DDEBUG_MONITOR=1 
 PROJECT = Daemon
 
 SAMDIR=./

@@ -27,26 +27,22 @@ int32_t udpsock_create(char *eth, char *ip, uint16_t port,
 	struct sockaddr_in sin;
 	struct ifreq ifr;
 
-	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
-	{
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
 		printf("[UDP-create]socket:%s", strerror(errno));
 		return false;
 	}
-	if(eth)		//socket绑定网卡
-	{
+	if (eth) {		//socket绑定网卡
 		memset(&ifr, 0, sizeof(ifr));
 		strcpy(ifr.ifr_name, (char *)eth);
-		if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, 
-                     (char *)&ifr, sizeof(struct ifreq)) == -1)
-		{
+		if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, 
+                     (char *)&ifr, sizeof(struct ifreq)) == -1) {
 			printf("[UDP-setopt]setsockopt:%s", strerror(errno));
 			close(sock);
 			return false;
 		}
 	}
 	tmps = 1;		// 允许发送广播数据
-	if(setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &tmps, sizeof(tmps)) == -1)
-	{
+	if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &tmps, sizeof(tmps)) == -1) {
 		printf("[UDP-broadcast]:setsockopt:%s", strerror(errno));
 		close(sock);
 		return false;
@@ -54,19 +50,15 @@ int32_t udpsock_create(char *eth, char *ip, uint16_t port,
 	tmps = 1;		// 允许端口重用
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &tmps, sizeof(tmps));
 	sin.sin_family = AF_INET;
-	if(ip)
-	{
+	if (ip) {
 		memcpy(&sin.sin_addr.s_addr, ip, 4);
-	}
-	else
-	{
+	} else {
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	}
 	sin.sin_port = htons(port);		// 网络字节顺序
 	memset(&sin.sin_zero, 0, 8);
 	/* 绑定socket */
-	if(bind(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
-	{
+	if (bind(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1) {
 		printf("[UDP-bind]bind:%s", strerror(errno));
 		close(sock);
 		return false;
@@ -87,18 +79,12 @@ int32_t udpsock_create(char *eth, char *ip, uint16_t port,
 int32_t udpsock_send(int32_t fd, char *ip, uint16_t port,
                    char *data, uint32_t len)
 {
-    if(port <= 0 || fd <= 0)
-    {
-        return false;
-    }
+    if (port <= 0 || fd <= 0) { return false; }
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
-	if(ip)
-	{
+	if (ip) {
 		memcpy(&addr.sin_addr.s_addr, ip, 4);
-	}
-	else
-	{
+	} else {
 		addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	}
 	addr.sin_port = htons(port);

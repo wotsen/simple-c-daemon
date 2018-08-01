@@ -27,24 +27,21 @@
 
 bool regex_match_string(const char *pattern, const char *data, char **match)
 {
-    if(!pattern) { return false; }
+    if (!pattern) { return false; }
     int32_t i = 0;
     int32_t len;
 
     regex_t reg;
     regmatch_t pmatch[REGEXS_NM];
 
-    if(regcomp(&reg, pattern, REG_EXTENDED) < 0) { return false; }
-    if(regexec(&reg, data, REGEXS_NM, pmatch, 0))
-    {
+    if (regcomp(&reg, pattern, REG_EXTENDED) < 0) { return false; }
+    if (regexec(&reg, data, REGEXS_NM, pmatch, 0)) {
         regfree(&reg);
         return false;
     }
-    for(i = 0; i < REGEXS_NM && pmatch[i].rm_so != 1; i++)
-    {
+    for (i = 0; i < REGEXS_NM && pmatch[i].rm_so != 1; i++) {
         len = pmatch[i].rm_eo-pmatch[i].rm_so;
-        if(len)
-        {
+        if (len) {
             memset(match[i], 0, 1024);
             memcpy(match[i], data+pmatch[i].rm_so, len);
         }
@@ -55,7 +52,7 @@ bool regex_match_string(const char *pattern, const char *data, char **match)
 
 bool regex_match_file(const char *pattern, FILE *fd, char **match)
 {
-    if(!pattern) { return false; }
+    if (!pattern) { return false; }
     int32_t i = 0;
     int32_t len, err;
     char buf[1024];
@@ -63,24 +60,18 @@ bool regex_match_file(const char *pattern, FILE *fd, char **match)
     regex_t reg;
     regmatch_t pmatch[REGEXS_NM];
 
-    if(regcomp(&reg, pattern, REG_EXTENDED) < 0) { return false; }
-    for(memset(buf, 0, sizeof(buf)); NULL != fgets(buf, sizeof(buf), fd);)
-    {
+    if (regcomp(&reg, pattern, REG_EXTENDED) < 0) { return false; }
+    for (memset(buf, 0, sizeof(buf)); NULL != fgets(buf, sizeof(buf), fd);) {
         err = regexec(&reg, buf, REGEXS_NM, pmatch, 0);
-        if(err == REG_NOMATCH)
-        {
+        if (err == REG_NOMATCH) {
             continue;
-        }
-        else if(err)
-        {
+        } else if (err) {
             regfree(&reg);
             return false;
         }
-        for(i = 0; i < REGEXS_NM && pmatch[i].rm_so != 1; i++)
-        {
+        for (i = 0; i < REGEXS_NM && pmatch[i].rm_so != 1; i++) {
             len = pmatch[i].rm_eo-pmatch[i].rm_so;
-            if(len)
-            {
+            if (len) {
                 memset(match[i], '\0', 1024);
                 memcpy(match[i], buf+pmatch[i].rm_so, len);
             }

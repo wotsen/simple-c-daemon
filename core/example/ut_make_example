@@ -1,0 +1,25 @@
+SRCS = test.c
+
+PROJECT = test
+
+GCC = gcc
+
+LIBS = -lcmockery
+
+INCLUDE = -I./
+
+CFLAGS = -DUNIT_TESTING
+
+CFLAG = -Wall
+
+OBJS = $(patsubst %.c,%.o,$(SRCS))
+
+$(PROJECT):$(OBJS)
+	@ $(GCC) -o $@ $^ $(CFLAG) $(CFLAGS) $(LIBS) 
+	@ du -b $(PROJECT) 
+
+%.o:%.c
+	$(GCC) -c $(CFLAG) $(CFLAGS) $(INCLUDE) -o $@ $< 
+
+clean:
+	rm -f $(PROJECT) *.o 

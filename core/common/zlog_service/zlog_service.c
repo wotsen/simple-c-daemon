@@ -28,8 +28,7 @@ static char dzlog_initial(const char *fmt_conf, const char *category)
     int rc;
     zlog_reload(fmt_conf);
     rc = dzlog_init(fmt_conf, category);
-    if (rc) 
-    {
+    if (rc) {
         printf("dzlog init failed\n");
         return false;
     }
@@ -40,11 +39,11 @@ static void dzlog_out_stream(const char *log_path, const char *category,
                              char lv, const char *fmt, va_list args)
 {
     pthread_mutex_lock(&zlog_lock);
-    if(!dzlog_initial(log_path, category)){
+    if (!dzlog_initial(log_path, category)) {
         pthread_mutex_unlock(&zlog_lock);
         return;
     }
-    switch(lv){
+    switch (lv) {
         case LV_DEBUG:
             vdzlog_debug(fmt, args);
             break;
