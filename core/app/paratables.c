@@ -56,7 +56,7 @@ class_para applications_para[] = {
 };
 
 class_para network_para[] = {
-    {KEY_HEART_BEAT,            4096,   __void,    r_, NULL,        NULL,
+    {KEY_HEART_BEAT,            4096,   __str,    r_, NULL,        NULL,
         NULL,   NULL,   default_key_tail},
 
     PARA_END
@@ -84,6 +84,7 @@ class_module *get_module_by_id(unsigned char id)
     for ( ; NULL != _modules->section; module++) {
         if(module->id == id) { return module; }
     }
+    dbg_error("module id err");
     return NULL;
 }
 

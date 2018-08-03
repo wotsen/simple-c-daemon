@@ -48,7 +48,7 @@
 
 /* data-type */
 #define __bool                          1
-#define __char                          2
+#define __schar                          2
 #define __uchar                         3
 #define __short                         4
 #define __ushort                        5
