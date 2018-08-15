@@ -26,12 +26,42 @@
 #include "../module/def.h"
 #include "../module//tools/tools.h"
 
+#define STR_HEAD                "head"
+#define STR_HEAD_OS_TYPE        "os-type"
+#define STR_HEAD_HOSTNAME       "hostname"
+#define STR_HEAD_OS_RELEASE     "os-release"
+#define STR_HEAD_OS_VERSION     "os-version"
+#define STR_HEAD_OS_MACHINE     "os-machine"
+#define STR_HEAD_CUR_TIME       "cyr-time"
+
+#define STR_MODULE              "module"
+#define STR_MODULE_SRC          "src"
+#define STR_MODULE_DEST         "dest"
+#define STR_MODULE_NAME         "module-name"
+#define STR_MODULE_ID           "module-id"
+#define STR_MODULE_LEN          "module-len"
+#define STR_MODULE_ACK          "module-ack"
+#define STR_MODULE_CMD          "module-cmd"
+
+#define STR_KEY                 "key"
+#define STR_KEY_NEXT            "key-"
+#define STR_KEY_END             "key-end"
+#define STR_KEY_NAME            "key-name"
+#define STR_KEY_ID              "key-id"
+#define STR_KEY_LEN             "key-len"
+#define STR_KEY_TYPE            "key-type"
+#define STR_KEY_ACK             "key-ack"
+#define STR_KEY_CMD             "key-cmd"
+#define STR_KEY_CONTEXT         "key-context"
+
+#define JSON_STR_INI            "none"
+#define STR_END                 "end"
 
 /* module-cmd */
-#define GET_CMD             0x01
-#define SET_CMD             0x02
-#define HEART_CMD           0x03
-#define END_CMD             0xFF
+#define GET_CMD                 0x01
+#define SET_CMD                 0x02
+#define HEART_CMD               0x03
+#define END_CMD                 0xFF
 
 #define ACK_INIT                0xff
 #define ACK_OK                  0x0

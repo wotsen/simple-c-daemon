@@ -21,6 +21,10 @@
 #include <json-c/json.h>
 #include "../../module/list.h"
 
+#define STR_ADDRESS         "address"
+#define STR_IP              "ip"
+#define STR_PORT            "port"
+
 void push_udp_data_list(struct json_object *recv);
 struct json_object *pop_udp_data_list(void);
 

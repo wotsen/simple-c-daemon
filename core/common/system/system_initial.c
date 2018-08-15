@@ -23,6 +23,7 @@
 #include "../common.h"
 
 extern void para_initial(void);
+extern void network_initial();
 
 static struct utsname _os_info;
 
@@ -66,4 +67,5 @@ void system_initial(void)
     _uname();
     config_initial();
     para_initial();
+    network_initial();
 }

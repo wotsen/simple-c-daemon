@@ -76,7 +76,7 @@ int32_t udpsock_create(char *eth, char *ip, uint16_t port,
 	return sock;
 }
 /* UDP发送 */
-int32_t udpsock_send(int32_t fd, char *ip, uint16_t port,
+int32_t udpsock_send(int32_t fd, uint8_t *ip, uint16_t port,
                    char *data, uint32_t len)
 {
     if (port <= 0 || fd <= 0) { return false; }

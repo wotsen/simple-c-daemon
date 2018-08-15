@@ -32,7 +32,7 @@ void unpack_udpdata(char *data, int32_t len, char *ip, uint16_t port);
 /* UDP 套接字创建 */
 int32_t udpsock_create(char *eth, char *ip, uint16_t port, uint32_t sendtime, uint32_t recvtime);
 /* UDP发送 */
-int32_t udpsock_send(int32_t fd, char *ip, uint16_t port, char *data, uint32_t len);
+int32_t udpsock_send(int32_t fd, uint8_t *ip, uint16_t port, char *data, uint32_t len);
 
 /* UDP数据解析 */
 void unpack_tcpdata(char *data, int32_t len, char *ip, uint16_t port);

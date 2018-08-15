@@ -33,4 +33,10 @@ bool put_udp_task(udp_task_function fun);
 void udp_net_initial(void);
 void *udp_network_task(void*);
 
+void set_addr_info(struct json_object *packet, uint8_t *ip, uint16_t port);
+void get_addr_info(struct json_object *packet, uint8_t *ip, uint16_t *port);
+void get_addr_info_by_addr(struct json_object *addr, uint8_t *ip, uint16_t *port);
+
+void send_udp_packet(struct json_object *obj_send, uint8_t *ip, uint16_t port);
+
 #endif

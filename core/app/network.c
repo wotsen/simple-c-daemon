@@ -39,18 +39,18 @@ struct json_object *pack_heart_beat(void)
 
     json_object_set_int(
             json_object_object_get(
-                json_object_object_get(heart, "module"),
-                "module-len"),
+                json_object_object_get(heart, STR_MODULE),
+                STR_MODULE_LEN),
             1);
     json_object_set_int(
             json_object_object_get(
-                json_object_object_get(heart, "module"),
-                "module-cmd"), 
+                json_object_object_get(heart, STR_MODULE),
+                STR_MODULE_CMD), 
             HEART_CMD);
 
     json_object_object_add(
             heart,
-            "key-1", 
+            STR_KEY_NEXT"1", 
             pack_json_para(para, (char *)"daemon heart beat"));
 
     pack_key_end(heart);
@@ -67,14 +67,13 @@ static void *network_task(void* arg)
             ostime_delay(OS_SEC(1));
             continue;
         }
-#if 1
+#if 0
         dbg_print("recv : %s", 
                 json_object_to_json_string_ext(
                     recv, 
                     JSON_C_TO_STRING_SPACED | JSON_C_TO_STRING_PRETTY));
 #endif
         unpack_json(recv);
-        json_object_put(recv);
         recv = NULL;
     }
     return ((void *)0);
@@ -95,7 +94,6 @@ void network_start(void)
 {
     pthread_t thread_id;
 
-    network_initial();
     udp_network_start(); 
     pthread_create(&thread_id, NULL, &network_task, NULL);
 }

@@ -29,11 +29,11 @@ struct _os_base_info {
 };
 
 static const struct os_base_info system_uname[] = {
-    {"os-type",     os_type},
-    {"hostname",     hostname},
-    {"os-release",  os_release},
-    {"os-version",  os_version},
-    {"os-machine",  os_machine},
+    {STR_HEAD_OS_TYPE,     os_type},
+    {STR_HEAD_HOSTNAME,    hostname},
+    {STR_HEAD_OS_RELEASE,  os_release},
+    {STR_HEAD_OS_VERSION,  os_version},
+    {STR_HEAD_OS_MACHINE,  os_machine},
     {NULL, NULL}
 };
 
@@ -53,33 +53,10 @@ struct json_object *pack_json_head()
                                system_uname[i].key, 
                                json_object_new_string(system_uname[i].get()));
     }
-    json_object_object_add(hobj, "cur-time", json_object_new_string(time));
-    json_object_object_add(obj, "head", hobj);
+    json_object_object_add(hobj, STR_HEAD_CUR_TIME, json_object_new_string(time));
+    json_object_object_add(obj, STR_HEAD, hobj);
 
     return obj;
-}
-
-
-static void _get_addr_info(struct json_object *addr,
-                           uint8_t *ip, uint16_t *port)
-{
-    ip[0] = json_object_get_int(
-                json_object_array_get_idx(
-                    json_object_object_get(addr, "ip"), 
-                    0));
-    ip[1] = json_object_get_int(
-                json_object_array_get_idx(
-                    json_object_object_get(addr, "ip"), 
-                    1));
-    ip[2] = json_object_get_int(
-                json_object_array_get_idx(
-                    json_object_object_get(addr, "ip"), 
-                    2));
-    ip[3] = json_object_get_int(
-                json_object_array_get_idx(
-                    json_object_object_get(addr, "ip"), 
-                    3));
-    *port = json_object_get_int(json_object_object_get(addr, "port"));
 }
 
 static bool _record_to_sqlite3_db(
@@ -94,15 +71,15 @@ static bool _record_packet_site_info(struct json_object *head,
                                     struct json_object *addr)
 {
     const char *_os_type    = json_object_get_string(
-                                json_object_object_get(head, "os-type"));
+                                json_object_object_get(head, STR_HEAD_OS_TYPE));
     const char *_hostname   = json_object_get_string(
-                                json_object_object_get(head, "hostname"));
+                                json_object_object_get(head, STR_HEAD_HOSTNAME));
     const char *_os_release = json_object_get_string(
-                                json_object_object_get(head, "os-release"));
+                                json_object_object_get(head, STR_HEAD_OS_RELEASE));
     const char *_os_version = json_object_get_string(
-                                json_object_object_get(head, "os-version"));
+                                json_object_object_get(head, STR_HEAD_OS_VERSION));
     const char *_os_machine = json_object_get_string(
-                                json_object_object_get(head, "os-machine"));
+                                json_object_object_get(head, STR_HEAD_OS_MACHINE));
 
     if (!_os_type || !_hostname || !_os_release ||
         !_os_version || !_os_machine) {
@@ -118,16 +95,16 @@ static bool _record_packet_site_info(struct json_object *head,
 
     uint16_t port = 0;
     uint8_t ip[4] = { [0 ... 3] = 0 };
-    _get_addr_info(addr, ip, &port);
+    get_addr_info_by_addr(addr, ip, &port);
 
     return _record_to_sqlite3_db(os_head, ip, port);
 }
 
 bool unpack_json_head(struct json_object *packet)
 {
-    struct json_object *head   = json_object_object_get(packet, "head");
-    struct json_object *module = json_object_object_get(packet, "module");
-    struct json_object *addr   = json_object_object_get(packet, "address");
+    struct json_object *head   = json_object_object_get(packet, STR_HEAD);
+    struct json_object *module = json_object_object_get(packet, STR_MODULE);
+    struct json_object *addr   = json_object_object_get(packet, STR_ADDRESS);
 
     if (!head || !module || !addr) { return false; }
 

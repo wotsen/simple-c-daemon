@@ -29,28 +29,28 @@ struct json_object *pack_json_module(
     struct json_object *mobj = json_object_new_object();
 
     json_object_object_add(mobj,
-                           "src",
-                           json_object_new_string("none"));
+                           STR_MODULE_SRC,
+                           json_object_new_string(JSON_STR_INI));
     json_object_object_add(mobj,
-                           "dest", 
-                           json_object_new_string("none"));
+                           STR_MODULE_DEST, 
+                           json_object_new_string(JSON_STR_INI));
     json_object_object_add(mobj,
-                           "module-name",
+                           STR_MODULE_NAME,
                            json_object_new_string(module->section));
     json_object_object_add(mobj,
-                           "module-id",
+                           STR_MODULE_ID,
                            json_object_new_int(module->id));
     json_object_object_add(mobj,
-                           "module-len",
+                           STR_MODULE_LEN,
                            json_object_new_int(0));
     json_object_object_add(mobj,
-                           "module-ack",
+                           STR_MODULE_ACK,
                            json_object_new_int(ACK_INIT));
     json_object_object_add(mobj,
-                           "module-cmd",
+                           STR_MODULE_CMD,
                            json_object_new_int(0));
 
-    json_object_object_add(packet, "module", mobj);
+    json_object_object_add(packet, STR_MODULE, mobj);
 
     return packet;
 }
@@ -60,7 +60,7 @@ static int32_t _get_key_len(struct json_object *module)
     int32_t len = 0;
     struct  json_object *key_len = NULL;
 
-    if (!(key_len = json_object_object_get(module, "module-len"))) {
+    if (!(key_len = json_object_object_get(module, STR_MODULE_LEN))) {
         return 0;
     }
     if (!(len = json_object_get_int(key_len))) { 
@@ -72,7 +72,7 @@ static int32_t _get_key_len(struct json_object *module)
 static struct json_object *_get_module_obj_ack(struct json_object *module)
 {
     struct  json_object *obj_ack = NULL;
-    if (!(obj_ack = json_object_object_get(module, "module-ack"))) {
+    if (!(obj_ack = json_object_object_get(module, STR_MODULE_ACK))) {
         return NULL;
     }
     return obj_ack;
@@ -109,7 +109,7 @@ static const uint8_t CMD_INUSE[] = {
 static bool _get_module_cmd(struct json_object *module, uint8_t *cmd)
 {
     struct  json_object *obj_cmd = NULL;
-    if (!(obj_cmd = json_object_object_get(module, "module-cmd"))) {
+    if (!(obj_cmd = json_object_object_get(module, STR_MODULE_CMD))) {
         return false;
     }
     *cmd = json_object_get_int(obj_cmd);
@@ -130,7 +130,7 @@ static bool _get_module_name(struct json_object *module, uint8_t *name)
 {
     struct  json_object *obj_name = NULL;
     char *str = NULL;
-    if (!(obj_name = json_object_object_get(module, "module-name"))) {
+    if (!(obj_name = json_object_object_get(module, STR_MODULE_NAME))) {
         return false;
     }
 
@@ -144,7 +144,7 @@ static bool _get_module_name(struct json_object *module, uint8_t *name)
 static bool _get_module_id(struct json_object *module, uint16_t *id)
 {
     struct  json_object *obj_id = NULL;
-    if (!(obj_id = json_object_object_get(module, "module-id"))) {
+    if (!(obj_id = json_object_object_get(module, STR_MODULE_ID))) {
         return false;
     }
     *id = json_object_get_int(obj_id);
@@ -163,6 +163,12 @@ static class_module *_get_module(uint16_t id, uint8_t *name)
 
 void reply_pack(struct json_object *packet)
 {
+    uint8_t ip[4];
+    uint16_t port;
+    get_addr_info(packet, ip, &port);
+    json_object_object_del(packet, STR_ADDRESS);
+    dbg_error();
+    send_udp_packet(packet, ip, port);
 }
 
 bool unpack_json_module(struct json_object *packet)
@@ -171,17 +177,18 @@ bool unpack_json_module(struct json_object *packet)
     uint16_t mo_id = 0;
     uint8_t mo_name[127] = { [0 ... 126] = '\0'};
     class_module *_module;
-    struct json_object *module = json_object_object_get(packet, "module");
+    struct json_object *module = json_object_object_get(packet, STR_MODULE);
 
     /* ack检查 */
     if (!_check_module_ack(module)) {
         _set_module_ack(module, ACK_ERR);
-        /* 直接回复 */
+        reply_pack(packet);
         return false;
     }
     /* cmd检查 */
     if (!_check_module_cmd(module)) {
         _set_module_ack(module, ACK_NOT_SUPPORT_CMD);
+        reply_pack(packet);
         return false;
     }
 
@@ -189,21 +196,24 @@ bool unpack_json_module(struct json_object *packet)
     if (!_get_module_id(module, &mo_id) ||
         !_get_module_name(module, mo_name)) {
         _set_module_ack(module, ACK_NO_SUCH_MODULE);
+        reply_pack(packet);
         return false;
     }
     if (!(_module = _get_module(mo_id, mo_name))) {
         _set_module_ack(module, ACK_NO_SUCH_MODULE);
+        reply_pack(packet);
         return false;
     }
-        /* 区分模块 */
-            /* 参量处理 */
+    /* 区分模块 */
+    /* 参量处理 */
     if (!(len = _get_key_len(module))) {
         _set_module_ack(module, ACK_KEY_LEN_ERR);
+        reply_pack(packet);
         return false;
     }
 
-    get_set_para_key(_module, packet, len);
-    /* 回复 */
+    _set_module_ack(module, get_set_para_key(_module, packet, len));
+    reply_pack(packet);
 
     return true;
 }
