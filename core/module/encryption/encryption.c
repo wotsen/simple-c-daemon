@@ -189,23 +189,23 @@ int main()
 {
 	uint8_t md[33] = {0};
 	uint8_t md2[33] = {0};
-	const uint8_t *pass = "password_key";
+	const char *pass = "password_key";
 
-	md5(pass, md);
+	md5(pass, "yuanyuan", md);
 
 	printf("md5: %s\n", md);
 
 	memset(md, 0, sizeof(md));
-	sha256(pass, md);
+	sha256(pass, "yuanyuan", md);
 
 	printf("sha256: %s\n", md);
 
 	memset(md, 0, sizeof(md));
-	des_en(pass, md);
+	des_en(pass,"yuanyuan",  md);
 
 	printf("des: %s\n", md);
 
-	des_de(md, md2);
+	des_de(md,"yuanyuan",  md2);
 
 	printf("des: %s\n", md2);
 	return 0;
