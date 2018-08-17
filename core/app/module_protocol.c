@@ -167,7 +167,6 @@ void reply_pack(struct json_object *packet)
     uint16_t port;
     get_addr_info(packet, ip, &port);
     json_object_object_del(packet, STR_ADDRESS);
-    dbg_error();
     send_udp_packet(packet, ip, port);
 }
 

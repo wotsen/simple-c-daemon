@@ -19,7 +19,6 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-
 #include "../zlog_service/zlog_service.h"
 #include "../enc_wrap/enc_wrap.h"
 #include "user_pass.h"

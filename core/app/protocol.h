@@ -27,12 +27,12 @@
 #include "../module//tools/tools.h"
 
 #define STR_HEAD                "head"
-#define STR_HEAD_OS_TYPE        "os-type"
+#define STR_HEAD_OS_TYPE        "os_type"
 #define STR_HEAD_HOSTNAME       "hostname"
-#define STR_HEAD_OS_RELEASE     "os-release"
-#define STR_HEAD_OS_VERSION     "os-version"
-#define STR_HEAD_OS_MACHINE     "os-machine"
-#define STR_HEAD_CUR_TIME       "cyr-time"
+#define STR_HEAD_OS_RELEASE     "os_release"
+#define STR_HEAD_OS_VERSION     "os_version"
+#define STR_HEAD_OS_MACHINE     "os_machine"
+#define STR_HEAD_CUR_TIME       "cur_time"
 
 #define STR_MODULE              "module"
 #define STR_MODULE_SRC          "src"
