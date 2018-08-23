@@ -15,6 +15,9 @@
 #ifndef _ENCRYPTION_H
 #define _ENCRYPTION_H
 
+#include <inttypes.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,15 +28,24 @@ enum{
 	SHA512_TYPE,
 	DES_EN_TYPE,
 	DES_DE_TYPE,
+    CRYPT_MAX_TYPE,
 };
+
+static inline bool check_crypto_type_valid(const uint8_t type)
+{
+    if (type >= CRYPT_MAX_TYPE) {
+        return false;
+    }
+    return true;
+}
 
 #define OWNER_DES_KEY		"yuyuan34"
 
-unsigned char *openssl_lib(unsigned char encrypt_type, const unsigned char *dest_str, 
-                           unsigned char *key, unsigned char *md);
+uint8_t *openssl_lib(uint8_t encrypt_type, const uint8_t *dest_str, 
+                           uint8_t *key, uint8_t *md);
 
-#define md5(str, key, md)	    openssl_lib(MD5_TYPE, str, key, md)
-#define sha256(str, key, md)	openssl_lib(SHA256_TYPE, str, key, md)
+#define md5(str, md)	        openssl_lib(MD5_TYPE, str, NULL, md)
+#define sha256(str, md)	        openssl_lib(SHA256_TYPE, str, NULL, md)
 #define des_en(str, key, md)	openssl_lib(DES_EN_TYPE, str, key, md)
 #define des_de(str, key, md)	openssl_lib(DES_DE_TYPE, str, key, md)
 

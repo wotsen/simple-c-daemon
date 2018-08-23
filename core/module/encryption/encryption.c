@@ -29,55 +29,60 @@ typedef uint8_t *(*abstract_fun)(
                         uint8_t, const uint8_t *, 
                         uint8_t *, uint8_t *);
 
-static uint8_t *_md5__sha256_abstract(
-                        uint8_t encrypt_type, 
+static uint8_t *_get_md5_abstract(
                         const uint8_t *dest_str, 
                         uint8_t *md)
 {
-
-	encrypt_fun encrypt;
-
-    if (!dest_str || !md) { return NULL; }
-
 	uint8_t len = strlen((char *)dest_str);
 	int i = 0;
 	uint8_t tmp_md[64] = {0};
 	char dest_key[128] = {0};
 	char char_tmp[3] = {0};
 
-	switch (encrypt_type) {
-		case MD5_TYPE:
-			encrypt = MD5;
-			break;
-		case SHA256_TYPE:
-			encrypt = SHA256;
-			break;
-		default:
-			return NULL;
-	}
-	if (!encrypt(dest_str, len, tmp_md)) { return NULL; }
+	if (!MD5(dest_str, len, tmp_md)) { return NULL; }
 	for (i = 0; i < 32; i++) {
 		sprintf(char_tmp, "%02x", tmp_md[i]);
 		strcat(dest_key, char_tmp);
 	}
 	dest_key[32] = '\0';
 	memcpy(md, dest_key, 32);
+
 	return md;
 }
 
+static uint8_t *_get_sha256_abstract(
+                        const uint8_t *dest_str, 
+                        uint8_t *md)
+{
+	uint8_t len = strlen((char *)dest_str);
+	int i = 0;
+	uint8_t tmp_md[65] = {0};
+	char dest_key[128] = {0};
+	char char_tmp[3] = {0};
+
+	if (!SHA256(dest_str, len, tmp_md)) { return NULL; }
+	for (i = 0; i < 64; i++) {
+		sprintf(char_tmp, "%02x", tmp_md[i]);
+		strcat(dest_key, char_tmp);
+	}
+	dest_key[64] = '\0';
+	memcpy(md, dest_key, 64);
+
+	return md;
+}
 
 static uint8_t *_md5_abstract(uint8_t encrypt_type, 
                               const uint8_t *dest_str, 
                               uint8_t *key, uint8_t *md5)
 {
-	return _md5__sha256_abstract(encrypt_type, dest_str, md5);
+	return _get_md5_abstract(dest_str, md5);
 }
 
 static uint8_t *_sha256_abstract(uint8_t encrypt_type,
                                  const uint8_t *dest_str, 
                                  uint8_t *key, uint8_t *sha256)
 {
-	return _md5__sha256_abstract(encrypt_type, dest_str, sha256);
+	return _get_sha256_abstract(dest_str, sha256);
 }
 
 
@@ -86,8 +91,10 @@ static uint8_t *_sha256_abstract(uint8_t encrypt_type,
 static uint8_t *__des_en_de__(int mode, const uint8_t *dest_str, 
                               uint8_t *key, uint8_t *md)
 {
+    if (!key) { return NULL; }
 	uint8_t vec_cipher_text[512] = {0};
 	uint8_t tmp[DES_KEY_LEN] = {0};
+	char char_tmp[3] = {0};
 	
 	int i = 0;
     uint8_t dest_len = strlen((char *)dest_str);
@@ -161,6 +168,9 @@ uint8_t *openssl_lib(uint8_t encrypt_type,
                      const uint8_t *dest_str, 
                      uint8_t *key, uint8_t *md)
 {
+    if (!check_crypto_type_valid(encrypt_type)) { return NULL; }
+    if (!dest_str || !md) { return NULL; }
+
 	abstract_fun abstract;
 
 	switch (encrypt_type) {

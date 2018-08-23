@@ -1,0 +1,26 @@
+SRCS = encryption_test.c \
+       encryption.c
+
+PROJECT = encrypt
+
+GCC = gcc
+
+LIBS = -lcmockery -lssl -lcrypto
+
+INCLUDE = -I./
+
+CFLAGS = -DUNIT_TESTING
+
+CFLAG = -Wall
+
+OBJS = $(patsubst %.c,%.o,$(SRCS))
+
+$(PROJECT):$(OBJS)
+	@ $(GCC) -o $@ $^ $(CFLAG) $(CFLAGS) $(LIBS) 
+	@ du -b $(PROJECT) 
+
+%.o:%.c
+	$(GCC) -c $(CFLAG) $(CFLAGS) $(INCLUDE) -o $@ $< 
+
+clean:
+	rm -f $(PROJECT) *.o 
