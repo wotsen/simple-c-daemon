@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  th.c
+ *       Filename:  __std__.c
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  08/03/2018 09:16:33 AM
+ *        Created:  08/20/2018 10:45:40 AM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,23 +16,9 @@
  * =====================================================================================
  */
 #include <stdlib.h>
-#include <threads.h>
-
-int *fun(void *arg)
-{
-    int i = 0;
-    while (i < 4) {
-        printf("thread run [%d]\n", i);
-        i++;
-    }
-}
+#include <stdio.h>
 
 int main()
 {
-    thrd_t thr;
-    int a = 10 + 90;
-    thrd_create(&thr, &fun, NULL);
-    thrd_join(thr, NULL);
-    printf("exit\n");
-    return 0;
+    printf("std:%d, date:%s, time:%s\n", __STDC__, __DATE__, __TIME__);
 }
