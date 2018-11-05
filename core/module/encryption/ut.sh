@@ -1,3 +1,3 @@
 make -f ut_make_example
-./test
+./encrypt
 make -f ut_make_example clean

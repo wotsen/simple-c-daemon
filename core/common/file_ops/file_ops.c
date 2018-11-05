@@ -89,8 +89,8 @@ bool set_key_value(dictionary *dict, const char *section,
         case __bool:
             sprintf(s_val, "%s", (*val ? "true" : "false"));
             break;
-        case __char:
-            sprintf(s_val, "%d", *val);
+        case __schar:
+            sprintf(s_val, "%d", (int8_t)*val);
             break;
         case __uchar:
             sprintf(s_val, "%d", (uint8_t)*val);
@@ -182,10 +182,10 @@ bool strto_type_val(const char *s, char *val, const char type, int32_t len)
         case __bool:
             *val = strcmp(s, "true") ? false : true;
             break;
-        case __char:
+        case __schar:
             ll_tmp = strtoll(s, NULL, 0);
             if (check_strtoll(ll_tmp)) {
-                *val = (char)ll_tmp;
+                *val = (int8_t)ll_tmp;
             }
             break;
         case __uchar:

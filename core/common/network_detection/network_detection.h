@@ -16,6 +16,7 @@
 #define _NETWORK_DETECTION_H
 #include <json-c/json.h>
 #include <stdbool.h>
+#include "network_list.h"
 
 #define DAEMON_SERVER_PORT      6000
 #define VER_CENTER_PORT         6001
@@ -26,15 +27,16 @@
 
 #define NET_DATA_LEN_MAX        1024
 
-typedef struct {
-    struct json_object *udp_data;
-    struct list_head list;
-}class_udp_recv_list;
-
 typedef struct json_object *(*udp_task_function)(void);
 
 bool put_udp_task(udp_task_function fun);
 void udp_net_initial(void);
-void network_start(void);
+void *udp_network_task(void*);
+
+void set_addr_info(struct json_object *packet, uint8_t *ip, uint16_t port);
+void get_addr_info(struct json_object *packet, uint8_t *ip, uint16_t *port);
+void get_addr_info_by_addr(struct json_object *addr, uint8_t *ip, uint16_t *port);
+
+void send_udp_packet(struct json_object *obj_send, uint8_t *ip, uint16_t port);
 
 #endif

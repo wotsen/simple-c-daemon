@@ -1,10 +1,11 @@
-SRCS = test.c
+SRCS = encryption_test.c \
+       encryption.c
 
-PROJECT = test
+PROJECT = encrypt
 
 GCC = gcc
 
-LIBS = -lcmockery
+LIBS = -lcmockery -lssl -lcrypto
 
 INCLUDE = -I./
 

@@ -18,6 +18,7 @@
 #include "../common.h"
 
 extern void system_initial(void);
+extern void network_start(void);
 
 void system_start(void)
 {

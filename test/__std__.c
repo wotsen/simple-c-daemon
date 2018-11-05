@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  zlog_config.c
+ *       Filename:  __std__.c
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  07/05/2018 03:03:42 PM
+ *        Created:  08/20/2018 10:45:40 AM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -18,16 +18,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "zlog_service.h"
-#include "zlog_config.h"
-
-char zlog_config_path[60] = SYSTEM_LOG_CONF;
-
-void zlog_config_initial(void)
+int main()
 {
-    FILE *fd;
-    fd = fopen(zlog_config_path, "w");
-    fprintf(fd, zlog_config, LOG_PATH, LOG_PATH, LOG_PATH, LOG_PATH); 
-    fflush(fd);
-    fclose(fd);
+    printf("std:%d, date:%s, time:%s\n", __STDC__, __DATE__, __TIME__);
 }

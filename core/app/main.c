@@ -43,7 +43,7 @@ int main(int args, char **argv)
 #ifdef DAEMON
     create_daemon();
 #endif
-    printf("%d %s\n", args, argv[0]);
+    if (args && argv) { }
     system_start();
     return 0;
 }
