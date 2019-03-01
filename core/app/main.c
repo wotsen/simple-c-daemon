@@ -20,19 +20,20 @@
 
 #ifdef DAEMON_TEST
 
-#define DIR_MODE   1
-#define STD_MODE   0
+#define DIR_MODE 1
+#define STD_MODE 0
 
 #else
 
-#define DIR_MODE    0
-#define STD_MODE    1
+#define DIR_MODE 0
+#define STD_MODE 1
 
 #endif
 
 void create_daemon(void)
 {
-    if (-1 == daemon(DIR_MODE, STD_MODE)) {
+    if (-1 == daemon(DIR_MODE, STD_MODE))
+    {
         system_info("daemon initial ending:error");
         exit(0);
     }
@@ -43,7 +44,9 @@ int main(int args, char **argv)
 #ifdef DAEMON
     create_daemon();
 #endif
-    if (args && argv) { }
+    if (args && argv)
+    {
+    }
     system_start();
     return 0;
 }
